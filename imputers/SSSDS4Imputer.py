@@ -78,7 +78,7 @@ class Residual_block(keras.Model):
         h = h + part_t
         
         h = self.conv_layer(h)
-        h = self.S41(h.permute(2,0,1)).permute(1,2,0)     
+        h = self.S41(h) 
         
         assert cond is not None
         cond = self.cond_conv(cond)
