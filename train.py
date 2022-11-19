@@ -6,10 +6,21 @@ import tensorflow as tf
 from tensorflow import keras
 from utils.util import find_max_epoch, print_size, training_loss, calc_diffusion_hyperparams
 from utils.util import get_mask_mnr, get_mask_bm, get_mask_rm
-
-from imputers.DiffWaveImputer import DiffWaveImputer
-from imputers.SSSDSAImputer import SSSDSAImputer
+from tqdm import tqdm
 from imputers.SSSDS4Imputer import SSSDS4Imputer
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+  try:
+    # Currently, memory growth needs to be the same across GPUs
+    for gpu in gpus:
+      tf.config.experimental.set_memory_growth(gpu, True)
+    logical_gpus = tf.config.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+  except RuntimeError as e:
+    # Memory growth must be set before GPUs have been initialized
+    print(e)
 
 
 def train(output_directory,
@@ -56,9 +67,9 @@ def train(output_directory,
     print("output directory", output_directory, flush=True)
 
     # map diffusion hyperparameters to gpu
-    for key in diffusion_hyperparams:
-        if key != "T":
-            diffusion_hyperparams[key] = diffusion_hyperparams[key].cuda()
+    # for key in diffusion_hyperparams:
+    #     if key != "T":
+    #         diffusion_hyperparams[key] = diffusion_hyperparams[key].cuda()
 
     # predefine model
     if use_model == 0:
@@ -66,13 +77,13 @@ def train(output_directory,
     elif use_model == 1:
         net = SSSDSAImputer(**model_config).cuda()
     elif use_model == 2:
-        net = SSSDS4Imputer(**model_config).cuda()
+        net = SSSDS4Imputer(**model_config)
     else:
         print('Model chosen not available.')
-    print_size(net)
+    # print_size(net)
 
     # define optimizer
-    net.compile(optimizer=keras.optimizers.Adam(learning_rate), loss=keras.losses.MeanSquaredError)
+    net.compile(optimizer=keras.optimizers.Adam(learning_rate), loss='mse')
 
     # load checkpoint
     if ckpt_iter == 'max':
@@ -112,7 +123,7 @@ def train(output_directory,
     # training
     n_iter = ckpt_iter + 1
     while n_iter < n_iters + 1:
-        for batch in training_data:
+        for batch in tqdm(training_data):
 
             if masking == 'rm':
                 transposed_mask = get_mask_rm(batch[0], missing_k)
@@ -129,7 +140,7 @@ def train(output_directory,
             batch = tf.transpose(batch, perm=[0, 2, 1])
             # batch = batch.permute(0, 2, 1)
 
-            assert batch.size() == mask.size() == loss_mask.size()
+            assert batch.shape == mask.shape == loss_mask.shape
 
             # back-propagation
             X = batch, batch, mask, loss_mask
@@ -138,14 +149,15 @@ def train(output_directory,
                                  only_generate_missing=only_generate_missing)
 
             if n_iter % iters_per_logging == 0:
-                print("iteration: {} \tloss: {}".format(n_iter, loss.item()))
+                print("iteration: {} \tloss: {}".format(n_iter, loss))
 
             # save checkpoint
             if n_iter > 0 and n_iter % iters_per_ckpt == 0:
-                checkpoint_name = '{}.pkl'.format(n_iter)
-                torch.save({'model_state_dict': net.state_dict(),
-                            'optimizer_state_dict': optimizer.state_dict()},
-                           os.path.join(output_directory, checkpoint_name))
+                checkpoint_name = '{}/{}'.format(n_iter, n_iter)
+                net.save_weights(os.path.join(output_directory, checkpoint_name))
+                # torch.save({'model_state_dict': net.state_dict(),
+                #             'optimizer_state_dict': optimizer.state_dict()},
+                #            os.path.join(output_directory, checkpoint_name))
                 print('model at iteration %s is saved' % n_iter)
 
             n_iter += 1

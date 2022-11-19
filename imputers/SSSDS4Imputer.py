@@ -11,7 +11,7 @@ def swish(x):
 class Conv(keras.Model):
     def __init__(self, out_channels, kernel_size):
         super(Conv, self).__init__()
-        self.conv = keras.layers.Conv1D(out_channels, kernel_size, padding='same', kernel_initializer= tf.keras.initializers.HeNormal())
+        self.conv = keras.layers.Conv1D(out_channels, kernel_size, padding='same', data_format='channels_first', kernel_initializer= tf.keras.initializers.HeNormal())
 
     def call(self, x):
         out = self.conv(x)
@@ -20,11 +20,12 @@ class Conv(keras.Model):
 class ZeroConv1d(keras.Model):
     def __init__(self, out_channels):
         super(ZeroConv1d, self).__init__()
-        self.conv = keras.layers.Conv1D(out_channels, kernel_size=1, padding='valid', 
+        self.conv = keras.layers.Conv1D(out_channels, kernel_size=1, padding='valid', data_format='channels_first',
+        # kernel_initializer= tf.keras.initializers.HeNormal(),
         kernel_initializer='zeros',
         bias_initializer='zeros')
     
-    def forward(self, x):
+    def call(self, x):
         out = self.conv(x)
         return out
 
@@ -51,8 +52,8 @@ class Residual_block(keras.Model):
                           bidirectional=s4_bidirectional,
                           layer_norm=s4_layernorm)
  
-        self.conv_layer = Conv(self.res_channels, 2 * self.res_channels, kernel_size=3)
-
+        self.conv_layer = Conv(2 * self.res_channels, kernel_size=3)
+        # self.conv_layer = Conv(self.res_channels, 2 * self.res_channels, kernel_size=3)
         self.S42 = S4Layer(features=2*self.res_channels, 
                           lmax=s4_lmax,
                           N=s4_d_state,
@@ -60,21 +61,22 @@ class Residual_block(keras.Model):
                           bidirectional=s4_bidirectional,
                           layer_norm=s4_layernorm)
         
-        self.cond_conv = Conv(2*in_channels, 2*self.res_channels, kernel_size=1)  
+        self.cond_conv = Conv(2*self.res_channels, kernel_size=1)  
+        # self.cond_conv = Conv(2*in_channels, 2*self.res_channels, kernel_size=1)  
+        self.res_conv = keras.layers.Conv1D(res_channels, kernel_size=1, data_format='channels_first', kernel_initializer= tf.keras.initializers.HeNormal())
 
-        self.res_conv = keras.layers.Conv1D(res_channels, kernel_size=1, kernel_initializer= tf.keras.initializers.HeNormal())
-
-        self.skip_conv = keras.layers.Conv1D(skip_channels, kernel_size=1, kernel_initializer= tf.keras.initializers.HeNormal())
+        self.skip_conv = keras.layers.Conv1D(skip_channels, kernel_size=1, data_format='channels_first', kernel_initializer= tf.keras.initializers.HeNormal())
 
 
-    def forward(self, input_data):
+    def call(self, input_data):
         x, cond, diffusion_step_embed = input_data
         h = x
         B, C, L = x.shape
         assert C == self.res_channels                      
                  
         part_t = self.fc_t(diffusion_step_embed)
-        part_t = part_t.view([B, self.res_channels, 1])  
+        # print(part_t.shape)
+        part_t = tf.expand_dims(part_t, -1)  
         h = h + part_t
         
         h = self.conv_layer(h)
@@ -84,7 +86,7 @@ class Residual_block(keras.Model):
         cond = self.cond_conv(cond)
         h += cond
         
-        h = self.S42(h.permute(2,0,1)).permute(1,2,0)
+        h = self.S42(h)
         
         out = keras.activations.tanh(h[:,:self.res_channels,:]) * keras.activations.sigmoid(h[:,self.res_channels:,:])
 
@@ -129,7 +131,7 @@ class Residual_group(keras.Model):
                                                        s4_layernorm=s4_layernorm))
 
             
-    def forward(self, input_data):
+    def call(self, input_data):
         noise, conditional, diffusion_steps = input_data
 
         diffusion_step_embed = calc_diffusion_step_embedding(diffusion_steps, self.diffusion_step_embed_dim_in)
@@ -142,7 +144,7 @@ class Residual_group(keras.Model):
             h, skip_n = self.residual_blocks[n]((h, conditional, diffusion_step_embed))  
             skip += skip_n  
 
-        return skip * math.sqrt(1.0 / self.num_res_layers)  
+        return skip * tf.math.sqrt(1.0 / self.num_res_layers)  
 
 
 class SSSDS4Imputer(keras.Model):
@@ -176,7 +178,7 @@ class SSSDS4Imputer(keras.Model):
         self.final_conv = keras.Sequential([Conv(skip_channels, kernel_size=1), 
         keras.layers.ReLU(), ZeroConv1d(out_channels)])
 
-    def forward(self, input_data):
+    def call(self, input_data):
         
         noise, conditional, mask, diffusion_steps = input_data 
         # mask=tf.cast(mask,dtype=tf.float32)
@@ -188,5 +190,6 @@ class SSSDS4Imputer(keras.Model):
         x = self.init_conv(x)
         x = self.residual_layer((x, conditional, diffusion_steps))
         y = self.final_conv(x)
+        y = y*(1-mask)
 
         return y

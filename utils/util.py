@@ -27,13 +27,7 @@ def find_max_epoch(path):
     files = os.listdir(path)
     epoch = -1
     for f in files:
-        if len(f) <= 4:
-            continue
-        if f[-4:] == '.pkl':
-            try:
-                epoch = max(epoch, int(f[:-4]))
-            except:
-                continue
+        epoch = max(epoch, int(f))
     return epoch
 
 
@@ -82,7 +76,7 @@ def calc_diffusion_step_embedding(diffusion_steps, diffusion_step_embed_dim_in):
     _embed = np.log(10000) / (half_dim - 1)
     _embed = tf.math.exp(tf.constant(np.arange(half_dim) * -_embed, dtype=tf.float32))
     # _embed = torch.exp(torch.arange(half_dim) * -_embed).cuda()
-    _embed = diffusion_steps * _embed
+    _embed = tf.cast(diffusion_steps, dtype=tf.float32) * _embed
     diffusion_step_embed = tf.concat((tf.math.sin(_embed),
                                       tf.math.cos(_embed)), axis=1)    
 
@@ -104,16 +98,15 @@ def calc_diffusion_hyperparams(T, beta_0, beta_T):
         These cpu tensors are changed to cuda tensors on each individual gpu
     """
 
-    Beta = tf.linspace(beta_0, beta_T, T) # Linear schedule
+    Beta = np.linspace(beta_0, beta_T, T) # Linear schedule
     Alpha = 1 - Beta
     Alpha_bar = Alpha + 0
     Beta_tilde = Beta + 0
     for t in range(1, T):
         Alpha_bar[t] *= Alpha_bar[t - 1]  # \bar{\alpha}_t = \prod_{s=1}^t \alpha_s
-        Beta_tilde[t] *= (1 - Alpha_bar[t - 1]) / (
-                1 - Alpha_bar[t])  # \tilde{\beta}_t = \beta_t * (1-\bar{\alpha}_{t-1})
+        Beta_tilde[t] *= (1 - Alpha_bar[t - 1]) / (1 - Alpha_bar[t])  # \tilde{\beta}_t = \beta_t * (1-\bar{\alpha}_{t-1})
         # / (1-\bar{\alpha}_t)
-    Sigma = tf.math.sqrt(Beta_tilde)  # \sigma_t^2  = \tilde{\beta}_t
+    Sigma = tf.math.sqrt(tf.constant(Beta_tilde, tf.float32))  # \sigma_t^2  = \tilde{\beta}_t
 
     _dh = {}
     _dh["T"], _dh["Beta"], _dh["Alpha"], _dh["Alpha_bar"], _dh["Sigma"] = T, Beta, Alpha, Alpha_bar, Sigma
@@ -147,16 +140,17 @@ def sampling(net, size, diffusion_hyperparams, cond, mask, only_generate_missing
 
     x = std_normal(size)
 
-    with torch.no_grad():
-        for t in range(T - 1, -1, -1):
-            if only_generate_missing == 1:
-                x = x * (1 - mask).float() + cond * mask.float()
-            diffusion_steps = (t * torch.ones((size[0], 1))).cuda()  # use the corresponding reverse step
-            epsilon_theta = net((x, cond, mask, diffusion_steps,))  # predict \epsilon according to \epsilon_\theta
-            # update x_{t-1} to \mu_\theta(x_t)
-            x = (x - (1 - Alpha[t]) / tf.math.sqrt(1 - Alpha_bar[t]) * epsilon_theta) / tf.math.sqrt(Alpha[t])
-            if t > 0:
-                x = x + Sigma[t] * std_normal(size)  # add the variance term to x_{t-1}
+
+    for t in range(T - 1, -1, -1):
+        if only_generate_missing == 1:
+            x = x * (1 - mask) + cond * mask
+        diffusion_steps = (t * tf.ones([size[0], 1]))  # use the corresponding reverse step
+        epsilon_theta = net((x, cond, mask, diffusion_steps,))  # predict \epsilon according to \epsilon_\theta
+        # update x_{t-1} to \mu_\theta(x_t)
+
+        x = (x - (1 - Alpha[t]) / tf.math.sqrt(tf.constant((1 - Alpha_bar[t]), tf.float32)) * epsilon_theta) / tf.math.sqrt(tf.constant(Alpha[t], tf.float32))
+        if t > 0:
+            x = x + Sigma[t] * std_normal(size)  # add the variance term to x_{t-1}
 
     return x
 
@@ -191,16 +185,16 @@ def training_loss(net, X, diffusion_hyperparams, only_generate_missing=1):
     # mask = tf.cast(mask, dtype=tf.float32)
     if only_generate_missing == 1:
         z = audio * mask + z * (1 - mask)
-    transformed_X = tf.math.sqrt(Alpha_bar[diffusion_steps]) * audio + tf.math.sqrt(
-        1 - Alpha_bar[diffusion_steps]) * z  # compute x_t from q(x_t|x_0)
-    epsilon_theta = net(
-        (transformed_X, cond, mask, diffusion_steps.view(B, 1),))  # predict \epsilon according to \epsilon_\theta
-
+    transformed_X = tf.math.sqrt(tf.constant(Alpha_bar[diffusion_steps],dtype=tf.float32)) * audio + tf.math.sqrt(
+        tf.constant((1 - Alpha_bar[diffusion_steps]),dtype=tf.float32)) * z  # compute x_t from q(x_t|x_0)
+    # epsilon_theta = net((transformed_X, cond, mask, tf.reshape(diffusion_steps, [B, 1])))  # predict \epsilon according to \epsilon_\theta
+    # print(epsilon_theta)
+    # print(aaa)
     if only_generate_missing == 1:
-        return net.train_on_batch(tf.boolean_mask(epsilon_theta, loss_mask), tf.boolean_mask(z, loss_mask))
+        return net.train_on_batch((transformed_X, cond, mask, tf.squeeze(diffusion_steps, 2)), z*(1-mask))
         # return loss_fn(epsilon_theta[loss_mask], z[loss_mask])
     elif only_generate_missing == 0:
-        return net.train_on_batch(epsilon_theta, z)
+        return net.train_on_batch((transformed_X, cond, mask, tf.reshape(diffusion_steps, [B, 1])), z)
         # return loss_fn(epsilon_theta, z)
 
 
