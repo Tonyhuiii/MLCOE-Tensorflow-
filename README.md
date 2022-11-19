@@ -6,9 +6,15 @@ Diffusion-based Time Series Imputation and Forecasting with Structured State Spa
 ● NVIDIA RTX 3090
 ## Prerequisites
 ● Python 3.9.13  
-● [Tensorflow](https://pytorch.org/) 2.10.0  
+● [Tensorflow](https://www.tensorflow.org/install) 2.10.0  
 ● cudatoolkit 11.2.2  
 ● cudnn 8.1.0 
+
+## Fast experiment - Mujoco dataset 90% random missing
+```
+python train.py -c config/config_SSSDS4.json
+python inference.py -c config/config_SSSDS4.json
+```
 
 ## To do list
 Part 1 (Dec. 15, 2022)  
@@ -16,7 +22,7 @@ Part 1 (Dec. 15, 2022)
 Train and test on mujoco dataset with 90% RM in orginal config_SSSDSA.json.  
 | Original paper | Pytorch code | Tensorflow code |
 | :----:| :----: | :----: |
-| 1.90(3)e-3 | 单元格 | 1.67e-3 |     
+| 1.90(3)e-3 | [1.76e-3](figures/test_pytorch.png) | [1.67e-3](figures/test_tf.png) |     
 
 ● Tensorflow implementation of CSDI   
 
