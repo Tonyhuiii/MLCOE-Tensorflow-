@@ -19,12 +19,12 @@ python inference.py -c config/config_SSSDS4.json
 ## To do list
 Part 1 (Dec. 15, 2022)  
 ● Tensorflow implementation of SSSD<sup>S4</sup>  (Finished on Nov.19)&#x2705;.    
-Train and test on mujoco dataset with 90% RM in orginal config_SSSDSA.json.  
+Train and test on mujoco dataset with 90% RM in orginal config_SSSDS4.json.  
 | Original paper | Pytorch code | Tensorflow code |
 | :----:| :----: | :----: |
 | 1.90(3)e-3 | [1.76e-3](figures/test_pytorch.png) | [1.67e-3](figures/test_tf.png) |     
 
-● Tensorflow implementation of CSDI   
+● Tensorflow implementation of CSDI   (Finished code on Nov.26, but have the bug keras optimizier didn't work, the loss didn't decrease!!!!)
 
 Part 2 Bonus question 1 (Jan. 7, 2023) (if possible)
 
