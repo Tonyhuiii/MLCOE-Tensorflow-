@@ -16,26 +16,28 @@ Diffusion-based Time Series Imputation and Forecasting with Structured State Spa
 1）Train and test on mujoco dataset with 90% RM in config_SSSDS4.json (reproduce results in orginal paper).  
 | Original paper | Pytorch code | Tensorflow code |
 | :----:| :----: | :----: |
-| 1.90(3)e-3 | [1.76e-3](figures/test_pytorch.png) | [1.67e-3](figures/test_tf.png) |     
+| 1.90(3)e-3 | [1.76e-3](figures/test_pytorch.png) | [1.67e-3](figures/test_tf.png) |    
+
+
 Fast experiment - Mujoco dataset 90% random missing
 ```
 python train.py -c config/config_SSSDS4.json
 python inference.py -c config/config_SSSDS4.json
 ```
 
-2） Train and test on Hang Seng dataset with random missing in Length with all 6 features (Tensorflow code).  
+2） Train and test on Hang Seng dataset with random missing in Length with all 6 features (finish experiment on Dec.1).  
 | Train MSE loss |  Test MSE loss |
 | :----:| :----: |
 |  [3.2e-3](figures/Hang_Seng_train.png) | [1e-3](figures/Hang_Seng_test.png) |   
 
-Fast experiment - Hang Seng dataset with missng_k=50
+Fast experiment - Hang Seng dataset with missing_k=50
 ```
 python train_stock.py -c config/config_SSSDS4_stock.json
 python inference_stock.py -c config/config_SSSDS4_stock.json
 ```
 
 
-● Tensorflow implementation of CSDI   (Finished code on Nov.26, but have the bug keras optimizier didn't work, the loss didn't decrease!!!!)
+● Tensorflow implementation of CSDI   (Finished code on Nov.26, but have the bug keras optimizier didn't work, [the loss didn't decrease!!!](https://discuss.tensorflow.org/t/tensorflow-2-11-0-training-loss-doesnt-decrease/13281))
 
 
 #### Part 2 Bonus question 1 (Jan. 7, 2023) (if possible)
