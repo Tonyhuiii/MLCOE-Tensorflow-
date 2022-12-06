@@ -10,7 +10,7 @@ from tqdm import tqdm
 from imputers.SSSDS4Imputer_stock import SSSDS4Imputer
 import random
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -23,6 +23,13 @@ if gpus:
     # Memory growth must be set before GPUs have been initialized
     print(e)
 
+def my_loss(y_true, y_pred):
+    residual = (y_true - y_pred)
+    num_eval = tf.cast(tf.math.count_nonzero(y_true), tf.float32)
+    # assert num_eval== y_true.shape[0]*train_config['missing_k']*6
+    # print(num_eval)
+    loss = tf.reduce_sum(residual ** 2)/ num_eval 
+    return loss
 
 def train(output_directory,
           ckpt_iter,
@@ -84,7 +91,8 @@ def train(output_directory,
     # print_size(net)
 
     # define optimizer
-    net.compile(optimizer=keras.optimizers.Adam(learning_rate), loss='mse')
+    # net.compile(optimizer=keras.optimizers.Adam(learning_rate), loss='mse')
+    net.compile(optimizer=keras.optimizers.Adam(learning_rate), loss=my_loss)
 
     # load checkpoint
     if ckpt_iter == 'max':
@@ -105,14 +113,18 @@ def train(output_directory,
 
     ### Custom data loading and reshaping ###
     training_data = np.load(trainset_config['train_data_path'])
-    training_data = np.split(training_data, 78, 0)
+    # training_data = np.split(training_data, 78, 0)  ### Hang Seng (78, 13, 239, 6)
+    # training_data = np.split(training_data[:2058], 49, 0)  ### Dow Jones (49, 42, 137, 6)
+    training_data = np.split(training_data, 61, 0)  ### Euro (61, 41, 94, 6)
     training_data = np.array(training_data)
     training_data = np.nan_to_num(training_data)
     training_data = tf.constant(training_data,dtype=tf.float32)
     print('Data loaded', training_data.shape)
 
     training_mask = np.load(trainset_config['train_mask_path'])
-    training_mask = np.split(training_mask, 78, 0)
+    # training_mask = np.split(training_mask, 78, 0)   ### Hang Seng
+    # training_mask = np.split(training_mask[:2058], 49, 0)  ### Dow Jones 
+    training_mask = np.split(training_mask, 61, 0)  ### Euro
     training_mask = np.array(training_mask) 
     print('Mask loaded',  training_mask.shape)   
     

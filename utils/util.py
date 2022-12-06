@@ -143,6 +143,7 @@ def sampling(net, size, diffusion_hyperparams, cond, mask, only_generate_missing
 
     for t in range(T - 1, -1, -1):
         if only_generate_missing == 1:
+            # print(x.shape, cond.shape)
             x = x * (1 - mask) + cond * mask
         diffusion_steps = (t * tf.ones([size[0], 1]))  # use the corresponding reverse step
         epsilon_theta = net((x, cond, mask, diffusion_steps,))  # predict \epsilon according to \epsilon_\theta
@@ -255,3 +256,47 @@ def get_mask_bm(sample, k):
         mask[:, channel][s_nan[0]:s_nan[-1] + 1] = 0
 
     return tf.constant(mask, dtype=tf.float32)
+
+
+def training_stock_loss(net, X, diffusion_hyperparams, only_generate_missing=1):
+    """
+    Compute the training loss of epsilon and epsilon_theta
+
+    Parameters:
+    net (torch network):            the wavenet model
+    loss_fn (torch loss function):  the loss function, default is nn.MSELoss()
+    X (torch.tensor):               training data, shape=(batchsize, 1, length of audio)
+    diffusion_hyperparams (dict):   dictionary of diffusion hyperparameters returned by calc_diffusion_hyperparams
+                                    note, the tensors need to be cuda tensors       
+    
+    Returns:
+    training loss
+    """
+
+    _dh = diffusion_hyperparams
+    T, Alpha_bar = _dh["T"], _dh["Alpha_bar"]
+
+    audio = X[0]
+    cond = X[1]
+    train_mask = X[2]
+    loss_mask = X[3]
+
+    B, C, L = audio.shape  # B is batchsize, C=1, L is audio length
+    diffusion_steps = tf.constant(np.random.randint(T, size=(B, 1, 1)))  # randomly sample diffusion steps from 1~T
+
+    z = std_normal(audio.shape)
+    if only_generate_missing == 1:
+        z = audio * train_mask + z * (1 - train_mask)
+    transformed_X = tf.math.sqrt(tf.constant(Alpha_bar[diffusion_steps],dtype=tf.float32)) * audio + tf.math.sqrt(
+        tf.constant((1 - Alpha_bar[diffusion_steps]),dtype=tf.float32)) * z  # compute x_t from q(x_t|x_0)
+    # epsilon_theta = net((transformed_X, cond, train_mask, loss_mask, tf.reshape(diffusion_steps, [B, 1])))  # predict \epsilon according to \epsilon_\theta
+    # print(aaa)
+    if only_generate_missing == 1:
+        # print('label', z[loss_mask>0].shape)
+        # return net.train_on_batch((transformed_X, cond, train_mask, loss_mask, tf.squeeze(diffusion_steps, 2)), z[loss_mask>0])
+        return net.train_on_batch((transformed_X, cond, train_mask, loss_mask, tf.squeeze(diffusion_steps, 2)), z*loss_mask)
+
+    elif only_generate_missing == 0:
+        ### train_mask all zeros 
+        ### loss_mask all ones
+        return net.train_on_batch((transformed_X, cond, train_mask, loss_mask, tf.reshape(diffusion_steps, [B, 1])), z)

@@ -20,7 +20,7 @@
         "s4_layernorm":1
     },
     "train_config": {
-        "output_directory": "./results/EuroStoxxs/20_mse",
+        "output_directory": "./results/EuroStoxxs/20",
         "ckpt_iter": "max",
         "iters_per_ckpt": 10000,
         "iters_per_logging": 1000,
@@ -40,7 +40,7 @@
         "sampling_rate": 100
     },
     "gen_config":{
-        "output_directory": "./results/EuroStoxxs/20_mse",
-        "ckpt_path": "./results/EuroStoxxs/20_mse/"
+        "output_directory": "./results/EuroStoxxs/20",
+        "ckpt_path": "./results/EuroStoxxs/20/"
     }
 }

@@ -13,7 +13,7 @@ from sklearn.metrics import mean_squared_error
 from statistics import mean
 import time
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -56,9 +56,9 @@ def generate(output_directory,
     local_path = "T{}_beta0{}_betaT{}".format(diffusion_config["T"],
                                               diffusion_config["beta_0"],
                                               diffusion_config["beta_T"])
-
+    local_path1 = 'inference'
     # Get shared output_directory ready
-    output_directory = os.path.join(output_directory, local_path)
+    output_directory = os.path.join(output_directory, local_path1)
     if not os.path.isdir(output_directory):
         os.makedirs(output_directory)
         os.chmod(output_directory, 0o775)
@@ -100,19 +100,23 @@ def generate(output_directory,
     ### Custom data loading and reshaping ###
     
     testing_data = np.load(trainset_config['test_data_path'])
-    testing_data = np.split(testing_data, 11, 0)
+    # testing_data = np.split(testing_data, 11, 0) ### Hang Seng (11, 23, 239, 6)
+    # testing_data = np.split(testing_data, 6, 0)  ### Dow Jones (6, 87, 137, 6)
+    testing_data = np.split(testing_data, 5, 0)  ### Euro (5, 125, 94, 6)
     testing_data = np.array(testing_data)
     testing_data = np.nan_to_num(testing_data)
     testing_data = tf.constant(testing_data, dtype=tf.float32)
     print('Data loaded', testing_data.shape)
 
     testing_mask = np.load(trainset_config['test_mask_path'])
-    testing_mask = np.split(testing_mask, 11, 0)
+    # testing_mask = np.split(testing_mask, 11, 0)
+    # testing_mask = np.split(testing_mask, 6, 0)
+    testing_mask = np.split(testing_mask, 5, 0)
     testing_mask = np.array(testing_mask) 
     print('Mask loaded',  testing_mask.shape)  
 
     all_mse = []
-
+    test_mse = []
     
     for i, batch in enumerate(testing_data):
 
@@ -162,16 +166,16 @@ def generate(output_directory,
         # mask = mask.numpy() 
         
         outfile = f'imputation{i}.npy'
-        new_out = os.path.join(ckpt_path, outfile)
+        new_out = os.path.join(output_directory, outfile)
         np.save(new_out, generated_audio)
 
         outfile = f'original{i}.npy'
-        new_out = os.path.join(ckpt_path, outfile)
+        new_out = os.path.join(output_directory, outfile)
         
         np.save(new_out, batch)
 
         outfile = f'masks{i}.npy'
-        new_out = os.path.join(ckpt_path, outfile)
+        new_out = os.path.join(output_directory, outfile)
         np.save(new_out, masks)
 
 
@@ -179,9 +183,12 @@ def generate(output_directory,
 
         # loss_mask = (1-mask)>0
         mse = mean_squared_error(generated_audio[loss_mask], batch[loss_mask])
+        mse1 = mean_squared_error((generated_audio*loss_mask).flatten(), (batch*loss_mask).flatten())
+        print(mse, mse1)
         all_mse.append(mse)
+        test_mse.append(mse1)
     
-    print('Total MSE:', mean(all_mse))
+    print('Total MSE:', mean(all_mse), mean(test_mse))
 
 
 if __name__ == "__main__":
