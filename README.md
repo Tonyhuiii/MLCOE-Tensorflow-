@@ -25,17 +25,26 @@ python train.py -c config/config_SSSDS4.json
 python inference.py -c config/config_SSSDS4.json
 ```
 
-2） Train and test on Hang Seng dataset with random missing in Length with all 6 features (finish experiment on Dec.1).  
-| Train MSE loss |  Test MSE loss |
-| :----:| :----: |
-|  [3.2e-3](figures/Hang_Seng_train.png) | [1e-3](figures/Hang_Seng_test.png) |   
+2） Train and test (MSE loss) on stock dataset with random missing in Length with all 6 features (finish experiment on Dec.1).  
+| Hang Seng | Dow Jones | EuroStoxx |
+| :----:| :----: | :----: |
+| [1e-3](figures/Hang_Seng_test.png)| [4.9e-4](figures/Dow_Jones_29_test.png) | [8.9e-4](figures/EuroStoxx_47_test.png) |    
 
 Fast experiment - Hang Seng dataset with missing_k=50
 ```
 python train_stock.py -c config/config_SSSDS4_stock.json
 python inference_stock.py -c config/config_SSSDS4_stock.json
 ```
-
+Fast experiment - Dow Jones dataset with missing_k=30
+```
+python train_stock.py -c config/config_SSSDS4_dow.json
+python inference_stock.py -c config/config_SSSDS4_dow.json
+```
+Fast experiment - EuroStoxx dataset with missing_k=20
+```
+python train_stock.py -c config/config_SSSDS4_euro.json
+python inference_stock.py -c config/config_SSSDS4_euro.json
+```
 
 ● Tensorflow implementation of CSDI   (Finished code on Nov.26, but have the bug keras optimizier didn't work, [the loss didn't decrease!!!](https://discuss.tensorflow.org/t/tensorflow-2-11-0-training-loss-doesnt-decrease/13281))
 
