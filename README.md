@@ -28,7 +28,7 @@ python train.py -c config/config_SSSDS4.json
 python inference.py -c config/config_SSSDS4.json
 ```
 
-**2) Train and test on stock dataset with blackout missing (BM) with all 6 features (finish experiment on Dec.1).** 
+**2) Train and test on stock dataset with blackout missing (BM) with all 6 features (finish experiment on Dec.1).**       
 *Note: some improvements in train_stock.py*     
 1.using different masks for each batch in the same iteration;     
 2.add my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the orginal PyTorch version using index for valid imputation noise (z[loss_mask]). Original mse loss (tf verison train.py) directly count all the mask numbers, although the value is zero for conditional noise (z*loss_mask).     
