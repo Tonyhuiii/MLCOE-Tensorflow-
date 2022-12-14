@@ -69,15 +69,15 @@ python inference_stock.py -c config/config_SSSDS4_euro.json
 *Bug: the training loss didn't decrease. (struggling!!)*              
 
 ***1) 20% RM on PTB-XL (CSDI) (updated on Dec.13)***     
-*Note: cannot reproduce the results using orginal PyTorch code with same training config.*         
+*Note: cannot reproduce the results using original PyTorch code with same training config.*         
 1.confusing masking config: In CSDI PyTorch code modified by SSSD authors, the code for **RM, MNR, BM** initlization in dataset are added, but the masks will not change in training. However, the original code for **random strategy** (missing ratios [0%, 100%]) or **historical strategy** in CSDI paper is still maintained in the CSDI model, which will change the mask during the training.        
-2.data length: should be 1000 or 250? For PTB-XL 1000 dataset, **considered L = 250 time steps** is mentioned in the paper. However, the table in the original paper shows training batch 4 with sample length 1000. Using this dataset config, **NVIDIA RTX3090 24GB out of memory** , which shoulde be same for NVIDIA A30 cards with 24GB that author used. Therefore, data length is set to 250, batch size is set to 16 for model training.
+2.data length: should be 1000 or 250? For PTB-XL 1000 dataset, **considered L = 250 time steps** is mentioned in the paper. However, the table in the original paper shows training batch 4 with sample length 1000. Using this dataset config, **NVIDIA RTX3090 24GB out of memory** , which should be same for NVIDIA A30 cards with 24GB memory that author used. For training config, sample length is set to 250, batch size is set to 16 .
 
 | Config | MAE | RMSE |  CRPS |
 | :----:| :----: | :----: |  :----: |
 | Paper results| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
 | PyTorch (20% RM + Random strategy)| [0.0102](figures/rm_0.2.png) | 0.0514 | 0.0698| 
-| PyTorch (0% RM + fixed 20% Random strategy)|  | | | 
+| PyTorch (0% RM + fixed 20% Random strategy)| [0.0114](figures/fixed_0.2_RS.png) | 0.0351| 0.0783 | 
 | Tensorflow| still |debug | ging | 
 
 ### Part 2 Bonus question  (if have time after finishing part 1)
