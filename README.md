@@ -12,7 +12,7 @@ Tensorflow implementation of paper: Diffusion-based Time Series Imputation and F
 ## To do list
 ### Part 1 (Dec. 15, 2022)  
 #### ●  Tensorflow implementation of SSSD<sup>S4</sup> (finished on Nov.19)&#x2705;.  
-***1） Train and test on MuJoCo dataset with 90% RM in config_SSSDS4.json (reproduce MSE results in orginal paper).***    
+***1） Validate the tensorflow code on MuJoCo dataset with config_SSSDS4.json (90%RM), config_SSSDS4_mujoco_70.json(70%RM).***    
 *Note: some limitations in the original PyTorch code*            
 1.the training batch is fixed during the iteration (they didn't use PyTorch Dataset and Dataloader for random shuffle);     
 2.the random misssing mask for different batchs is duplicated in the same iteration (not random enough);
@@ -23,12 +23,17 @@ python train.py -c config/config_SSSDS4.json
 python inference.py -c config/config_SSSDS4.json
 ```
 
-*IMPUTATION MSE RESULTS*    
+*IMPUTATION MSE RESULTS (RM 90% + Iterations 150,000)* (reproduce MSE results in orginal paper)&#x2705;    
 | Original paper | PyTorch code | Tensorflow code |
 | :----:| :----: | :----: |
 | 1.90(3)e-3 | [1.76e-3](figures/test_pytorch.png) | [1.67e-3](figures/test_tf.png) |      
 
-***2) Train and test on stock dataset with blackout missing (BM) with all 6 features (finished on Dec.1).***     
+*IMPUTATION MSE RESULTS (RM 70%)* (reproduce MSE results in orginal paper)&#x2705; 
+| Original paper (Iterations 232,000) | Tensorflow code (Iterations 240,000)|
+| :----:| :----: |
+| 0.59(8)e-3 | [0.53e-3](figures/test_tf_24000_rm.png) |
+
+***2) Train and test on stock dataset with random missing in length with all 6 features (finished on Dec.1).***     
 *Note: some improvements in train_stock.py*         
 1.using different masks for each batch in the same iteration;     
 2.add my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the original PyTorch version using index for valid imputation noise (z[loss_mask]). In the tensorflow verison of train.py, original mse loss directly counts all the mask numbers, although the value is zero for conditional noise (z*loss_mask).     
@@ -70,16 +75,20 @@ python inference_stock.py -c config/config_SSSDS4_euro.json
 
 ***1) 20% RM on PTB-XL (CSDI) (updated on Dec.13)***     
 *Note: cannot reproduce the results using original PyTorch code with same training config.*         
-1.confusing masking config: In CSDI PyTorch code modified by SSSD authors, the code for **RM, MNR, BM** initlization in dataset are added, but the masks will not change in training. However, the original code for **random strategy** (missing ratios [0%, 100%]) or **historical strategy** in CSDI paper is still maintained in the CSDI model, which will change the mask during the training.        
+1.confusing masking config: In CSDI PyTorch code modified by SSSD authors, the code for **RM, MNR, BM** initialization in dataset are added, but the masks will not change in training. Also I found the RM code is not same as the RM definition in SSSD paper and SSSD code. However, the original code for **random strategy** (missing ratios [0%, 100%]) or **historical strategy** in CSDI paper is still maintained in the CSDI model, which will change the mask during the training. Therefore, I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results in [1],[2],[3].
 2.data length: should be 1000 or 250? For PTB-XL 1000 dataset, **considered L = 250 time steps** is mentioned in the paper. However, the table in the original paper shows training batch 4 with sample length 1000. Using this dataset config, **NVIDIA RTX3090 24GB out of memory** , which should be same for NVIDIA A30 cards with 24GB memory that author used. For training config, sample length is set to 250, batch size is set to 16 .
 
-| Config | MAE | RMSE |  CRPS |
-| :----:| :----: | :----: |  :----: |
-| Paper results| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
-| PyTorch (20% RM + Random strategy)| [0.0102](figures/rm_0.2.png) | 0.0514 | 0.0698| 
-| PyTorch (0% RM + fixed 20% Random strategy)| [0.0114](figures/fixed_0.2_RS.png) | 0.0351| 0.0783 | 
-| Tensorflow| still |debug | ging | 
-
+| Results | Config | MAE | RMSE |  CRPS |
+| :----: | :----:| :----: | :----: |  :----: |
+| Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
+| PyTorch |  20% RM + Random strategy| [0.0102](figures/rm_0.2.png) | 0.0514 | 0.0698| 
+| PyTorch |  0% RM + fixed 20% Random strategy| [0.0114](figures/fixed_0.2_RS.png) | 0.0351| 0.0783 | 
+| PyTorch [1]|  20% RM implemented  | [0.0139](figures/rm_newversion_0.2.png) | 0.0390| 0.0928 | 
+| Tensorflow| | still |debug | ging | 
+| Paper  | 20% MNR| 0.0186±1e-5 | 0.0435±2e-4 | 0.1306±5e-5 | 
+| PyTorch [2] | 20% MNR implemented| [0.0136](figures/csdi_nrm.out) | 0.0397| 0.0918 | 
+| Paper  | 20% BM| 0.1054±4e-5 | 0.2254±7e-5 | 0.7468±2e-4 |   
+| PyTorch [3]| 20% BM implemented| [0.0486](figures/csdi_bm.out) | 0.1084| 0.3278 | 
 ### Part 2 Bonus question  (if have time after finishing part 1)
 ● Bonus question 1 (Jan. 7, 2023)       
 ● Bonus question 2 (Jan. 27, 2023)
