@@ -81,7 +81,7 @@ python inference_stock.py -c config/config_SSSDS4_euro.json
 | :----: | :----:| :----: | :----: |  :----: |
 | Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
 | PyTorch |  [20% RM + Random strategy](figures/rm_0.2.png)| 0.0102 | 0.0514 | 0.0698| 
-| PyTorch |  [0% RM + fixed 20% Random strategy](figures/fixed_0.2_RS.png)| 0.0114 | 0.0351| 0.0783 | 
+| PyTorch |  [0% RM + fixed 20% Random strategy](figures/fixed_0.2_RS.png)| 0.0114 | 0.0351| 0.0783 |                                
 3.I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results are shown in [1],[2],[3]. For CSDI evaluate code, I noticed that it used the median value of 10 samples generated for each test sample to calculate mae and rmse instead of averaged value as in the SSSD paper. I recalculate the averaged value based on the saved generated samples, the MAE and RMSE results are represented by average(median) in Table.
 | Results | Config | MAE | RMSE|  CRPS |
 | :----: | :----:| :----: | :----: |  :----: |
