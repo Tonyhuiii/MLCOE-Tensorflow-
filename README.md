@@ -71,7 +71,7 @@ python inference_stock.py -c config/config_SSSDS4_euro.json
 
 
 #### ● Tensorflow implementation of CSDI   (finished code on Nov.26)
-*Bug: the training loss didn't decrease. (struggling!!)*              
+*Bug: the training loss didn't decrease. (solved on Dec.21, correct the mistake for tensor shape not changing using tf.transpose(0,1,2))*              
 
 ***1) 20% RM on PTB-XL (CSDI) (updated on Dec.13)***     
 *Note: cannot reproduce the results using original PyTorch code with same training config.*         
