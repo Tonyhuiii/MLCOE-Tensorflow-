@@ -10,7 +10,7 @@ from tqdm import tqdm
 from imputers.SSSDS4Imputer_stock import SSSDS4Imputer
 import random
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -40,7 +40,7 @@ def train(output_directory,
           use_model,
           only_generate_missing,
           masking,
-          missing_k):
+          k_segments_or_k_misssing):
     
     """
     Train Diffusion Models
@@ -58,8 +58,8 @@ def train(output_directory,
 
     use_model (int):                0:DiffWave. 1:SSSDSA. 2:SSSDS4.
     only_generate_missing (int):    0:all sample diffusion.  1:only apply diffusion to missing portions of the signal
-    masking(str):                   'mnr': missing not at random, 'bm': blackout missing, 'rm': random missing
-    missing_k (int):                k missing time steps for each feature across the sample length.
+    masking(str):                   "random missing with length" or "blackout missing with length"
+    k_segments_or_k_misssing(int):  k_segments for "blackout missing with length", e.g., 5; k_misssing for "random missing with length", e.g., 50..
     """
 
     # generate experiment (local) path
@@ -113,18 +113,18 @@ def train(output_directory,
 
     ### Custom data loading and reshaping ###
     training_data = np.load(trainset_config['train_data_path'])
-    # training_data = np.split(training_data, 78, 0)  ### Hang Seng (78, 13, 239, 6)
+    training_data = np.split(training_data, 78, 0)  ### Hang Seng (78, 13, 239, 6)
     # training_data = np.split(training_data[:2058], 49, 0)  ### Dow Jones (49, 42, 137, 6)
-    training_data = np.split(training_data, 61, 0)  ### Euro (61, 41, 94, 6)
+    # training_data = np.split(training_data, 61, 0)  ### Euro (61, 41, 94, 6)
     training_data = np.array(training_data)
     training_data = np.nan_to_num(training_data)
     training_data = tf.constant(training_data,dtype=tf.float32)
     print('Data loaded', training_data.shape)
 
     training_mask = np.load(trainset_config['train_mask_path'])
-    # training_mask = np.split(training_mask, 78, 0)   ### Hang Seng
+    training_mask = np.split(training_mask, 78, 0)   ### Hang Seng
     # training_mask = np.split(training_mask[:2058], 49, 0)  ### Dow Jones 
-    training_mask = np.split(training_mask, 61, 0)  ### Euro
+    # training_mask = np.split(training_mask, 61, 0)  ### Euro
     training_mask = np.array(training_mask) 
     print('Mask loaded',  training_mask.shape)   
     
@@ -133,34 +133,43 @@ def train(output_directory,
     n_iter = ckpt_iter + 1
     while n_iter < n_iters + 1:
         for index, batch in enumerate(training_data):
-            #### generate random mask for each batch
-            mask_batch = training_mask[index] ### (B, L)
-            masks=[]
-            for j in range(len(mask_batch)):
-                mask = mask_batch[j] ###(L)
-                valid_mask=np.where(mask==1)[0]
-                # nan_mask=np.where(mask==0)[0]
-                # holiday_mask=np.where(mask==-1)[0]
-                # length = len(valid_mask)
-                perm = np.random.permutation(valid_mask)
-                idx = perm[0:missing_k]
-                mask[idx] = 2.0  #### label missing value as 2
-                masks.append(mask)
 
-            masks = np.array(masks) ### (B, L)
-            # print(masks.shape)
+            if masking == 'random missing with length':
+                #### generate random mask for each batch
+                mask_batch = training_mask[index] ### (B, L)
+                masks=[]
+                for j in range(len(mask_batch)):
+                    mask = mask_batch[j] ###(L)
+                    valid_mask=np.where(mask==1)[0]
+                    # nan_mask=np.where(mask==0)[0]
+                    # holiday_mask=np.where(mask==-1)[0]
+                    # length = len(valid_mask)
+                    perm = np.random.permutation(valid_mask)
+                    idx = perm[0:k_segments_or_k_misssing]
+                    mask[idx] = 2.0  #### label missing value as 2
+                    masks.append(mask)
+                masks = np.array(masks) ### (B, L)
+
+            elif masking == 'blackout missing with length':
+                observed_mask = training_mask[index]
+                # print(observed_mask.shape)
+                masks = np.ones(observed_mask.shape) ### (B, L)
+                length_index = np.array(range(observed_mask.shape[1]))
+                list_of_segments_index = np.array_split(length_index, k_segments_or_k_misssing)
+                # print(list_of_segments_index)
+                for i in range(len(observed_mask)):
+                    s_nan = random.choice(list_of_segments_index)
+                    masks[i, : ][s_nan[0]:s_nan[-1] + 1] = 2 #### label missing value as 2
             masks = np.tile(masks[:, :, None], (1, 1, 6)) ###(B, L, C)
             train_mask = masks.copy()
             train_mask[np.where(masks!=1)]=0
             train_mask = tf.constant(train_mask, dtype=tf.float32)
-            train_mask = tf.transpose(train_mask, perm=[0,2,1])
             loss_mask = masks.copy()
             loss_mask[np.where(masks==2)]=1
             loss_mask[np.where(masks!=2)]=0
             loss_mask = tf.constant(loss_mask, dtype=tf.float32)
+            train_mask = tf.transpose(train_mask, perm=[0,2,1]) ###(B, C, L)
             loss_mask = tf.transpose(loss_mask, perm=[0,2,1]) ###(B, C, L)
-
-            # assert masking == 'bm'
 
             batch = tf.transpose(batch, perm=[0, 2, 1])
 

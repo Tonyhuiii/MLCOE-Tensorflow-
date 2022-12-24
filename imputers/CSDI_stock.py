@@ -320,6 +320,7 @@ class CSDI_base(keras.Model):
         self.emb_feature_dim = config["model"]["featureemb"]
         self.is_unconditional = config["model"]["is_unconditional"]
         self.target_strategy = config["model"]["target_strategy"]
+        self.k_segments_or_k_misssing = config["model"]["k_segments_or_k_misssing"]
 
         self.emb_total_dim = self.emb_time_dim + self.emb_feature_dim
         if self.is_unconditional == False:
@@ -352,14 +353,15 @@ class CSDI_base(keras.Model):
 
         return tf.constant(pe, tf.float32)
 
-    def get_rm_in_length_mask(self, observed_mask, missing_k=50):
+    def get_rm_in_length_mask(self, observed_mask, k_segments_or_k_misssing=50):
+
         #### generate random mask for each batch ### (B, L)
         masks=[]
         for j in range(len(observed_mask)):
             mask = observed_mask[j].numpy()   ###(L)
             valid_mask=np.where(mask==1)[0]
             perm = np.random.permutation(valid_mask)
-            idx = perm[0:missing_k]
+            idx = perm[0:k_segments_or_k_misssing]
             mask[idx] = 2.0  #### label missing value as 2
             masks.append(mask)
         masks = np.array(masks) ### (B, L)
@@ -379,14 +381,14 @@ class CSDI_base(keras.Model):
         
         return train_mask, loss_mask
 
-    def get_bm_in_length_mask(self, observed_mask, k_segments=5):
-        
+    def get_bm_in_length_mask(self, observed_mask, k_segments_or_k_misssing=5):
+
         masks = np.ones(observed_mask.shape) ### (B, L)
         length_index = np.array(range(observed_mask.shape[1]))
-        list_of_segments_index = np.array_split(length_index, k_segments)
+        list_of_segments_index = np.array_split(length_index, k_segments_or_k_misssing)
         for i in range(len(observed_mask)):
             s_nan = random.choice(list_of_segments_index)
-            masks[i, : ][s_nan[0]:s_nan[-1] + 1] = 2
+            masks[i, : ][s_nan[0]:s_nan[-1] + 1] = 2 #### label missing value as 2
 
         masks = np.tile(masks[:, :, None], (1, 1, 6)) ###(B, L, K)
         train_mask = masks.copy()
@@ -502,9 +504,9 @@ class CSDI_base(keras.Model):
     def call(self, batch, is_train=1):
         (observed_data,observed_mask,observed_tp) = self.process_data(batch)
         if self.target_strategy == "random missing with length":
-            cond_mask, loss_mask = self.get_rm_in_length_mask(observed_mask)
+            cond_mask, loss_mask = self.get_rm_in_length_mask(observed_mask, self.k_segments_or_k_misssing)
         elif self.target_strategy == "blackout missing with length":
-            cond_mask, loss_mask= self.get_bm_in_length_mask(observed_mask)
+            cond_mask, loss_mask= self.get_bm_in_length_mask(observed_mask, self.k_segments_or_k_misssing)
         side_info = self.get_side_info(observed_tp, cond_mask)
         loss_func = self.calc_loss if is_train == 1 else self.calc_loss_valid
 
@@ -513,9 +515,9 @@ class CSDI_base(keras.Model):
     def evaluate(self, batch, n_samples):
         (observed_data,observed_mask,observed_tp) = self.process_data(batch)
         if self.target_strategy == "random missing with length":
-            cond_mask, loss_mask = self.get_rm_in_length_mask(observed_mask)
+            cond_mask, loss_mask = self.get_rm_in_length_mask(observed_mask, self.k_segments_or_k_misssing)
         elif self.target_strategy == "blackout missing with length":
-            cond_mask, loss_mask = self.get_bm_in_length_mask(observed_mask)
+            cond_mask, loss_mask = self.get_bm_in_length_mask(observed_mask, self.k_segments_or_k_misssing)
 
         target_mask = loss_mask
         side_info = self.get_side_info(observed_tp, cond_mask)
@@ -622,7 +624,6 @@ def get_dataloader_impute(series, masks, batch_size=4, len_dataset=100):
     impute_dataset = Custom_Impute_Dataset(series=series, masks=masks, use_index_list=indlist).getdata()
     impute_loader = tf.data.Dataset.from_tensor_slices(impute_dataset)  
     impute_loader = impute_loader.batch(batch_size)    
-    # impute_loader = DataLoader(impute_dataset, batch_size=batch_size, shuffle=False)
 
     return impute_loader
 
@@ -644,6 +645,7 @@ class CSDIImputer:
     def train(self,
               series,
               masks,
+              k_segments_or_k_misssing,
               train_split = 0.7,
               valid_split = 0.2,
               epochs = 200,
@@ -671,7 +673,8 @@ class CSDIImputer:
        
         Requiered parameters
         -series: Assumes series of shape (Samples, Length, Channels).
-        -masks: the mask of stock, holiday:-1; nan:0; valid:1.
+        -masks: the mask of stock, holiday:-1; nan:0; valid:1, assume the shape (Samples, Length).
+        -k_segments_or_k_misssing: k_segments for "blackout missing with length", e.g., 5; k_misssing for "random missing with length", e.g., 50.
         -path_save: full path where to save model weights, configuration file, and means and std devs for de-standardization in inference.
         
         Default parameters
@@ -720,6 +723,7 @@ class CSDIImputer:
         config['diffusion']['schedule'] = schedule
         
         config['model'] = {} 
+        config['model']['k_segments_or_k_misssing'] = k_segments_or_k_misssing
         config['model']['is_unconditional'] = is_unconditional
         config['model']['timeemb'] = timeemb
         config['model']['featureemb'] = featureemb

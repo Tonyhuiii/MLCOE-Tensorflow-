@@ -98,20 +98,23 @@ python train_csdi.py
 | :----: | :----:| :----: | :----: |  :----: |
 | Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
 | PyTorch [1]|  [20% RM implemented](figures/rm_newversion_0.2.png)  | 0.0168(0.0139) | 0.0470(0.0390)| 0.0928 | 
-| Tensorflow | [20% RM implemented](figures/rm_newversion_0.2.png) |debug | ging | ging |      
+| Tensorflow | [20% RM implemented](figures/csdi_rm_tf.out) |0.0125(0.0104) | 0.0398(0.0320) | 0.0718 |      
 | Paper  | 20% MNR| 0.0186±1e-5 | 0.0435±2e-4 | 0.1306±5e-5 | 
 | PyTorch [2] | [20% MNR implemented](figures/csdi_nrm.out)| 0.0158(0.0136) | 0.0553(0.0397)| 0.0918 | 
-| Tensorflow | [20% MNR implemented](figures/csdi_nrm.out) |debug | ging | ging |    
+| Tensorflow | [20% MNR implemented](figures/csdi_nrm_tf.out) |0.0098(0.0084)| 0.0301(0.0230) | 0.0582 |    
 | Paper  | 20% BM| 0.1054±4e-5 | 0.2254±7e-5 | 0.7468±2e-4 |   
-| PyTorch [3]| [20% BM implemented](figures/csdi_bm.out)| 0.0590(0.0486) | 0.1257(0.1084)| 0.3278 |    
-| Tensorflow | [20% BM implemented](figures/csdi_bm.out) |debug | ging | ging |   
+| PyTorch [3]| [20% BM implemented](figures/csdi_bm.out) | 0.0590(0.0486) | 0.1257(0.1084)| 0.3278 |    
+| Tensorflow | [20% BM implemented](figures/csdi_bm_tf.out) |0.0579 (0.0481)| 0.1240(0.1049) | 0.3279 |   
 
 ***1) Train and test on stock dataset (updated on Dec.24)***    
 *Note: some improvements in imputers/CSDI_stock.py*         
-1.write a clear version based on CSDI.py, and deleted all useless functions and config code.
+1.write a clear version based on CSDI.py, and deleted all useless functions and config code.       
 2.implemented my own masking methods for the stock data, including "random missing with length" and "blackout missing with length", you can change through the config by setting the target_strategy instead of the comment/uncomment by hand in the previous CSDI.py.
 
-
+Fast experiment - Hang Seng dataset with missing_k=50
+```
+python train_csdi_stock.py
+```
 
 ### Part 2 Bonus question  (if have time after finishing part 1)
 ● Bonus question 1 (Jan. 7, 2023)       
