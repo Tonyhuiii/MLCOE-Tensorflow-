@@ -51,12 +51,12 @@ python inference.py -c config/config_SSSDS4.json
 3.added my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the original PyTorch version using index for valid imputation noise (z[loss_mask]). In the tensorflow verison of train.py, original mse loss directly counts all the mask numbers, although the value is zero for conditional noise (z*loss_mask), will not affect the model training.       
 
 
-Fast experiment - Hang Seng dataset with "blackout missing with length"
+Fast experiment - Hang Seng dataset with "blackout missing with length"", k_segments=5
 ```
 python train_stock.py -c config/config_SSSDS4_stock.json
 python inference_stock.py -c config/config_SSSDS4_stock.json
 ```
-Fast experiment - Hang Seng dataset with "random missing with length"
+Fast experiment - Hang Seng dataset with "random missing with length", k_misssing=21
 ```
 python train_stock.py -c config/config_SSSDS4_stock_rm.json
 python inference_stock.py -c config/config_SSSDS4_stock_rm.json
@@ -107,12 +107,22 @@ python train_csdi.py
 ***2) Train and test on stock dataset (updated on Dec.24)***    
 *Note: some improvements in imputers/CSDI_stock.py compared to the imputers/CSDI.py*         
 1.write a clear version based on *imputers/CSDI.py*, and deleted all useless functions and config code.       
-2.implemented my own masking methods for the stock data, including "random missing with length" and "blackout missing with length", which can be changed through the config by the target_strategy setting instead of the comment/uncomment by hand in the previous *imputers/CSDI.py*.
+2.implemented two masking methods for the stock data, including "random missing with length" and "blackout missing with length", which can be changed through the config by the target_strategy setting instead of the comment/uncomment by hand in the previous *imputers/CSDI.py*. The masking code is same in train_stock.py (SSSD<sup>S4</sup>) for fair comparison.
 
-Fast experiment - Hang Seng dataset with missing_k=50
+Fast experiment - Hang Seng dataset with "random missing with length", k_misssing = 21; "blackout missing with length", k_segments = 5;
 ```
 python train_csdi_stock.py
 ```
+
+*Imputation results*  
+| Stock | Masking(RM or BM with length) | MAE | RMSE|
+| :----: | :----:| :----: | :----: |
+| Hang Seng | k_misssing = 21 | 0.0071 | 0.0160 |
+| Hang Seng | k_segments = 5 | 0.0205 | 0.0344 |       
+| Dow Jones | k_misssing = 28 | 0.0052 | 0.0150| 
+| Dow Jones | k_segments = 5 | 0.0128 | 0.0260 | 
+| EuroStoxx | k_misssing = 19 | 0.008 | 0.0213| 
+| EuroStoxx | k_segments = 5 | 0.0204 | 0.0353| 
 
 ### Part 2 Bonus question  (if have time after finishing part 1)
 ● Bonus question 1 (Jan. 7, 2023)       
