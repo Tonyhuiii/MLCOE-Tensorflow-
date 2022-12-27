@@ -120,11 +120,11 @@ for ticker in tickers:
     # label.shape
 
 ### save raw data
-np.save('stock_data/Hang Seng/Hang_Seng_57_data.npy', datas)
-np.save('stock_data/Hang Seng/Hang_Seng_57_label.npy', labels)
+np.save('stock_data/Hang_Seng/Hang_Seng_57_data.npy', datas)
+np.save('stock_data/Hang_Seng/Hang_Seng_57_label.npy', labels)
 
 #### load raw data
-x=np.load('stock_data/Hang Seng/Hang_Seng_57_data.npy')
+x=np.load('stock_data/Hang_Seng/Hang_Seng_57_data.npy')
 x_max = np.nanmax(x,axis=1)
 x_min = np.nanmin(x,axis=1)
 x_max= np.tile(x_max[:,None,:], (1, 5975, 1))
@@ -132,50 +132,49 @@ x_min= np.tile(x_min[:,None,:], (1, 5975, 1))
 
 ### normalize [0,1]
 x_normalize = (x - x_min)/(x_max-x_min)
-np.save('stock_data/Hang Seng/Hang_Seng_57_data_normalize.npy', x_normalize)
+np.save('stock_data/Hang_Seng/Hang_Seng_57_data_normalize.npy', x_normalize)
 
 #### load normalized data
-x_normalize = np.load('stock_data/Hang Seng/Hang_Seng_57_data_normalize.npy')
-y=np.load('stock_data/Hang Seng/Hang_Seng_57_label.npy')
+x_normalize = np.load('stock_data/Hang_Seng/Hang_Seng_57_data_normalize.npy')
+y=np.load('stock_data/Hang_Seng/Hang_Seng_57_label.npy')
 # masks = np.tile(y[:,:, None], (1, 1, 6))
 
 #### reshape [batch, length, channel]
-x = x_normalize.reshape(-1,239,6)
-masks = y.reshape(-1,239)
+x = x_normalize[:,:-1,:].reshape(-1,103,6) ### (3306, 103, 6)
+masks = y[:,:-1].reshape(-1,103)           ### (3306, 103)
 
-#### fiter the nan data before the stock has been on the market
+#### filter the batch with many nan data
 count=[]
 for index, batch in enumerate(masks):
     nan_mask = np.where(batch==0)[0]
-    if len(nan_mask)>230:
+    if len(nan_mask) < 10:
         count.append(index)
 
+x_filter=x[count]
+masks_filter=masks[count]
 
-x_filter = np.zeros((x.shape[0]-len(count), 239, 6))
-masks_filter = np.zeros((x.shape[0]-len(count), 239))
+# count=[]
+# for index, batch in enumerate(masks):
+#     holiday_mask = np.where(batch==-1)[0]
+#     if len(holiday_mask) > 5:
+#         count.append(index)
 
-k=0
-for index, batch in enumerate(x):
-    if index not in count:
-        x_filter[k] = x[index]
-        masks_filter[k] = masks[index]
-        k=k+1
 
 ### split train 0.8 /test 0.2
-x=x_filter
-masks=masks_filter
+x = x_filter
+masks = masks_filter
 np.random.seed(0)
 per = np.random.permutation(np.arange(x.shape[0]))
 train_index = per[:int(x.shape[0]*0.8)+1]
 test_index = per[int(x.shape[0]*0.8)+1:]
-x_train = x[train_index,:,:]
+x_train = x[train_index,:,:]  ### (2190, 103, 6)
 y_train = masks[train_index,:]
-np.save('stock_data/Hang Seng/Hang_Seng_train_data.npy', x_train)
-np.save('stock_data/Hang Seng/Hang_Seng_train_mask.npy', y_train)
-x_test = x[test_index,:,:]
+np.save('stock_data/Hang_Seng/train_data_103.npy', x_train)
+np.save('stock_data/Hang_Seng/train_mask_103.npy', y_train)
+x_test = x[test_index,:,:]    ### (547, 103, 6)
 y_test = masks[test_index,:]
-np.save('stock_data/Hang Seng/Hang_Seng_test_data.npy', x_test)
-np.save('stock_data/Hang Seng/Hang_Seng_test_mask.npy', y_test)
+np.save('stock_data/Hang_Seng/test_data_103.npy', x_test)
+np.save('stock_data/Hang_Seng/test_mask_103.npy', y_test)
 
 # np.isnan(data['0001.HK'].to_numpy()[0][0])
 # data.columns
@@ -205,6 +204,23 @@ np.save('stock_data/Hang Seng/Hang_Seng_test_mask.npy', y_test)
 # data1 = yf.download("AAPL", start="2017-01-01", end="2017-04-30")
 
 
+# x = x_normalize.reshape(-1,239,6)
+# masks = y.reshape(-1,239)
+# #### filter the nan data before the stock has been on the market
+# count=[]
+# for index, batch in enumerate(masks):
+#     nan_mask = np.where(batch==0)[0]
+#     if len(nan_mask)>230:
+#         count.append(index)
 
+# x_filter = np.zeros((x.shape[0]-len(count), 239, 6))
+# masks_filter = np.zeros((x.shape[0]-len(count), 239))
+
+# k=0
+# for index, batch in enumerate(x):
+#     if index not in count:
+#         x_filter[k] = x[index]
+#         masks_filter[k] = masks[index]
+#         k=k+1
 
 

@@ -20,7 +20,7 @@
         "s4_layernorm":1
     },
     "train_config": {
-        "output_directory": "./results/Dow_Jones/28",
+        "output_directory": "./results/Dow_Jones/5",
         "ckpt_iter": "max",
         "iters_per_ckpt": 5000,
         "iters_per_logging": 1000,
@@ -28,8 +28,8 @@
         "learning_rate": 2e-4,
         "only_generate_missing": 1,
         "use_model": 2,
-        "masking": "random missing with length",
-        "k_segments_or_k_misssing": 28
+        "masking": "blackout missing with length",
+        "k_segments_or_k_misssing": 5
     },
     "trainset_config":{
         "train_data_path": "stock_data/Dow_Jones/train_data.npy",
@@ -40,7 +40,7 @@
         "sampling_rate": 100
     },
     "gen_config":{
-        "output_directory": "./results/Dow_Jones/28",
-        "ckpt_path": "./results/Dow_Jones/28/"
+        "output_directory": "./results/Dow_Jones/5",
+        "ckpt_path": "./results/Dow_Jones/5/"
     }
 }

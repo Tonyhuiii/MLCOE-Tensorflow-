@@ -9,7 +9,7 @@ import math
 import json
 
 
-def train(model, config, train_loader, valid_loader=None, valid_epoch_interval=1, path_save=""):
+def train(model, config, train_loader, valid_loader=None, valid_epoch_interval=50, path_save=""):
 
     
     p1 = int(0.75 * config["epochs"]*len(train_loader))
@@ -36,8 +36,9 @@ def train(model, config, train_loader, valid_loader=None, valid_epoch_interval=1
 
                 it.set_postfix(ordered_dict={"avg_epoch_loss": avg_loss / batch_no,"epoch": epoch_no + 1},refresh=False)
     
-        output_path = path_save+'/{}/{}'.format(epoch_no, epoch_no)
-        model.save_weights(output_path)
+        if (epoch_no + 1) % valid_epoch_interval == 0:
+            output_path = path_save+'/{}/{}'.format(epoch_no, epoch_no)
+            model.save_weights(output_path)
 
         if valid_loader is not None and (epoch_no + 1) % valid_epoch_interval == 0:
             avg_loss_valid = 0
@@ -383,13 +384,15 @@ class CSDI_base(keras.Model):
 
     def get_bm_in_length_mask(self, observed_mask, k_segments_or_k_misssing=5):
 
-        masks = np.ones(observed_mask.shape) ### (B, L)
-        length_index = np.array(range(observed_mask.shape[1]))
-        list_of_segments_index = np.array_split(length_index, k_segments_or_k_misssing)
+        masks = []
         for i in range(len(observed_mask)):
+            mask = observed_mask[i].numpy() ###(L)
+            valid_mask = np.where(mask==1)[0]
+            list_of_segments_index = np.array_split(valid_mask, k_segments_or_k_misssing) ### only valid mask will be selected
             s_nan = random.choice(list_of_segments_index)
-            masks[i, : ][s_nan[0]:s_nan[-1] + 1] = 2 #### label missing value as 2
-
+            mask[s_nan] = 2 #### label missing value as 2 
+            masks.append(mask)              
+        masks = np.array(masks) ### (B, L)
         masks = np.tile(masks[:, :, None], (1, 1, 6)) ###(B, L, K)
         train_mask = masks.copy()
         train_mask[np.where(masks!=1)]=0

@@ -134,31 +134,23 @@ x_normalize = (x - x_min)/(x_max-x_min)
 np.save('stock_data/Dow_Jones/Dow_Jones_29_data_normalize.npy', x_normalize)
 
 #### load normalized data
-x_normalize = np.load('tock_data/Dow_Jones/Dow_Jones_29_data_normalize.npy')
+x_normalize = np.load('stock_data/Dow_Jones/Dow_Jones_29_data_normalize.npy')
 y = np.load('stock_data/Dow_Jones/Dow_Jones_29_label.npy')
 # masks = np.tile(y[:,:, None], (1, 1, 6))
 
 #### reshape [batch, length, channel]
-x = x_normalize.reshape(-1,137,6)
-masks = y.reshape(-1,137)
+x = x_normalize.reshape(-1,137,6)  ### (3364, 137, 6)
+masks = y.reshape(-1,137)          ### (3364, 137)
 
-#### fiter the nan data before the stock has been on the market
+#### filter the batch with many nan data
 count=[]
 for index, batch in enumerate(masks):
     nan_mask = np.where(batch==0)[0]
-    if len(nan_mask)>70:
+    if len(nan_mask) < 13:
         count.append(index)
 
-
-x_filter = np.zeros((x.shape[0]-len(count), 137, 6))
-masks_filter = np.zeros((x.shape[0]-len(count), 137))
-
-k=0
-for index, batch in enumerate(x):
-    if index not in count:
-        x_filter[k] = x[index]
-        masks_filter[k] = masks[index]
-        k=k+1
+x_filter=x[count]   ### (2604, 137, 6)
+masks_filter=masks[count]   ### (2604, 137)
 
 ### split train 0.8 /test 0.2
 x=x_filter
@@ -167,11 +159,28 @@ np.random.seed(0)
 per = np.random.permutation(np.arange(x.shape[0]))
 train_index = per[:int(x.shape[0]*0.8)]
 test_index = per[int(x.shape[0]*0.8):]
-x_train = x[train_index,:,:]
+x_train = x[train_index,:,:]    ### (2083, 137, 6)
 y_train = masks[train_index,:]
-np.save('stock_data/Dow_Jones/Dow_Jones_29_train_data.npy', x_train)
-np.save('stock_data/Dow_Jones/Dow_Jones_29_train_mask.npy', y_train)
-x_test = x[test_index,:,:]
+np.save('stock_data/Dow_Jones/train_data.npy', x_train)
+np.save('stock_data/Dow_Jones/train_mask.npy', y_train)
+x_test = x[test_index,:,:]      ### (521, 137, 6)
 y_test = masks[test_index,:]
-np.save('stock_data/Dow_Jones/Dow_Jones_29_test_data.npy', x_test)
-np.save('stock_data/Dow_Jones/Dow_Jones_29_test_mask.npy', y_test)
+np.save('stock_data/Dow_Jones/test_data.npy', x_test)
+np.save('stock_data/Dow_Jones/test_mask.npy', y_test)
+
+# #### filter the nan data before the stock has been on the market
+# count=[]
+# for index, batch in enumerate(masks):
+#     nan_mask = np.where(batch==0)[0]
+#     if len(nan_mask)>70:
+#         count.append(index)
+
+# x_filter = np.zeros((x.shape[0]-len(count), 137, 6))
+# masks_filter = np.zeros((x.shape[0]-len(count), 137))
+
+# k=0
+# for index, batch in enumerate(x):
+#     if index not in count:
+#         x_filter[k] = x[index]
+#         masks_filter[k] = masks[index]
+#         k=k+1

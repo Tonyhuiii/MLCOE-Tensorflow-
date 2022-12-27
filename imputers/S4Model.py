@@ -414,6 +414,9 @@ class SSKernelNPLR(keras.layers.Layer):
         omega = tf.constant(np.exp(-2j * np.pi / (L)), dtype=dtype)  # \omega_{2L}
         omega = omega ** tf.constant(np.arange(0, L // 2 + 1), dtype=dtype)
         z = 2 * (1 - omega) / (1 + omega)
+        # print(self.omega.shape)
+        # print(self.z.shape)
+        # print(omega.shape)
         if cache:
             self.omega.assign(_c2r(omega))
             self.z.assign(_c2r(z))
@@ -470,8 +473,10 @@ class SSKernelNPLR(keras.layers.Layer):
         w = repeat(w, 'n -> h n', h=H)
 
         # Cache Fourier nodes every time we set up a desired length
-        self.omega = tf.Variable(tf.zeros([51,2]), trainable=False)
-        self.z = tf.Variable(tf.zeros([51,2]), trainable=False)
+        # print(L)
+        # print(math.ceil(L/2)+1)
+        self.omega = tf.Variable(tf.zeros([L // 2 + 1,2]), trainable=False)
+        self.z = tf.Variable(tf.zeros([L // 2 + 1,2]), trainable=False)
         self.L = L
         # print(self.omega.dtype)
         if self.L is not None:
@@ -530,9 +535,10 @@ class SSKernelNPLR(keras.layers.Layer):
         if L is None:
             L = int(self.L / rate)
 
+        # print(int(rate)* L, self.L)
         # Increase the internal length if needed
         # while int(rate)* L > self.L:
-        #     print((tf.cast(rate, tf.int32) * L).numpy())
+        #     # print((tf.cast(rate, tf.int32) * L).numpy())
         #     print( self.L)
         #     self.double_length()
 

@@ -139,26 +139,18 @@ y = np.load('stock_data/EuroStoxx/EuroStoxx_47_label.npy')
 # masks = np.tile(y[:,:, None], (1, 1, 6))
 
 #### reshape [batch, length, channel]
-x = x_normalize[:, :8836].reshape(-1,94,6) ### delete last day data
-masks = y[:, :8836].reshape(-1,94)
+x = x_normalize[:, :-1].reshape(-1,94,6) ### (4418, 94, 6)
+masks = y[:, :-1].reshape(-1,94)  ### (4418, 94)
 
-#### fiter the nan data before the stock has been on the market
+#### filter the batch with many nan data
 count=[]
 for index, batch in enumerate(masks):
     nan_mask = np.where(batch==0)[0]
-    if len(nan_mask)>40:
+    if len(nan_mask) < 9:
         count.append(index)
 
-
-x_filter = np.zeros((x.shape[0]-len(count), 94, 6))
-masks_filter = np.zeros((x.shape[0]-len(count), 94))
-
-k=0
-for index, batch in enumerate(x):
-    if index not in count:
-        x_filter[k] = x[index]
-        masks_filter[k] = masks[index]
-        k=k+1
+x_filter=x[count]   ### (3096, 94, 6)
+masks_filter=masks[count]   ### (3096, 94)
 
 ### split train 0.8 /test 0.2
 x=x_filter
@@ -167,11 +159,31 @@ np.random.seed(0)
 per = np.random.permutation(np.arange(x.shape[0]))
 train_index = per[:int(x.shape[0]*0.8)+1]
 test_index = per[int(x.shape[0]*0.8)+1:]
-x_train = x[train_index,:,:]
+x_train = x[train_index,:,:]  ### (2477, 94, 6)
 y_train = masks[train_index,:]
-np.save('stock_data/EuroStoxx/EuroStoxx_47_train_data.npy', x_train)
-np.save('stock_data/EuroStoxx/EuroStoxx_47_train_mask.npy', y_train)
-x_test = x[test_index,:,:]
+np.save('stock_data/EuroStoxx/train_data_94.npy', x_train)
+np.save('stock_data/EuroStoxx/train_mask_94.npy', y_train)
+x_test = x[test_index,:,:]  ### (619, 94, 6)
 y_test = masks[test_index,:]
-np.save('stock_data/EuroStoxx/EuroStoxx_47_test_data.npy', x_test)
-np.save('stock_data/EuroStoxx/EuroStoxx_47_test_mask.npy', y_test)
+np.save('stock_data/EuroStoxx/test_data_94.npy', x_test)
+np.save('stock_data/EuroStoxx/test_mask_94.npy', y_test)
+
+
+
+# #### fiter the nan data before the stock has been on the market
+# count=[]
+# for index, batch in enumerate(masks):
+#     nan_mask = np.where(batch==0)[0]
+#     if len(nan_mask)>40:
+#         count.append(index)
+
+
+# x_filter = np.zeros((x.shape[0]-len(count), 94, 6))
+# masks_filter = np.zeros((x.shape[0]-len(count), 94))
+
+# k=0
+# for index, batch in enumerate(x):
+#     if index not in count:
+#         x_filter[k] = x[index]
+#         masks_filter[k] = masks[index]
+#         k=k+1

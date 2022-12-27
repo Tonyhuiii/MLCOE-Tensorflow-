@@ -10,7 +10,7 @@ from tqdm import tqdm
 from imputers.SSSDS4Imputer_stock import SSSDS4Imputer
 import random
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -113,18 +113,18 @@ def train(output_directory,
 
     ### Custom data loading and reshaping ###
     training_data = np.load(trainset_config['train_data_path'])
-    training_data = np.split(training_data, 78, 0)  ### Hang Seng (78, 13, 239, 6)
-    # training_data = np.split(training_data[:2058], 49, 0)  ### Dow Jones (49, 42, 137, 6)
-    # training_data = np.split(training_data, 61, 0)  ### Euro (61, 41, 94, 6)
+    training_data = np.split(training_data, 73, 0)  ### Hang Seng (2190, 103, 6) -> (73, 30, 103, 6)
+    # training_data = np.split(training_data[:-3], 52, 0)  ### Dow Jones (2080, 137, 6) -> (52, 40, 137, 6)
+    # training_data = np.split(training_data[:-2], 45, 0)  ### Euro (2475, 94, 6) -> (45, 55, 94, 6)
     training_data = np.array(training_data)
     training_data = np.nan_to_num(training_data)
     training_data = tf.constant(training_data,dtype=tf.float32)
     print('Data loaded', training_data.shape)
 
     training_mask = np.load(trainset_config['train_mask_path'])
-    training_mask = np.split(training_mask, 78, 0)   ### Hang Seng
-    # training_mask = np.split(training_mask[:2058], 49, 0)  ### Dow Jones 
-    # training_mask = np.split(training_mask, 61, 0)  ### Euro
+    training_mask = np.split(training_mask, 73, 0)   ### Hang Seng
+    # training_mask = np.split(training_mask[:-3], 52, 0)  ### Dow Jones 
+    # training_mask = np.split(training_mask[:-2], 45, 0)  ### Euro
     training_mask = np.array(training_mask) 
     print('Mask loaded',  training_mask.shape)   
     
@@ -151,15 +151,17 @@ def train(output_directory,
                 masks = np.array(masks) ### (B, L)
 
             elif masking == 'blackout missing with length':
-                observed_mask = training_mask[index]
-                # print(observed_mask.shape)
-                masks = np.ones(observed_mask.shape) ### (B, L)
-                length_index = np.array(range(observed_mask.shape[1]))
-                list_of_segments_index = np.array_split(length_index, k_segments_or_k_misssing)
-                # print(list_of_segments_index)
+                observed_mask = training_mask[index]### (B, L)
+                masks = []
                 for i in range(len(observed_mask)):
+                    mask = observed_mask[i] ###(L)
+                    valid_mask = np.where(mask==1)[0]
+                    list_of_segments_index = np.array_split(valid_mask, k_segments_or_k_misssing) ### only valid mask will be selected
                     s_nan = random.choice(list_of_segments_index)
-                    masks[i, : ][s_nan[0]:s_nan[-1] + 1] = 2 #### label missing value as 2
+                    mask[s_nan] = 2 #### label missing value as 2 
+                    masks.append(mask)                 
+                masks = np.array(masks) ### (B, L)
+
             masks = np.tile(masks[:, :, None], (1, 1, 6)) ###(B, L, C)
             train_mask = masks.copy()
             train_mask[np.where(masks!=1)]=0

@@ -9,9 +9,11 @@ from utils.util import find_max_epoch, print_size, sampling, calc_diffusion_hype
 
 from imputers.SSSDS4Imputer import SSSDS4Imputer
 
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from statistics import mean
 import time
+import random
+import math
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 gpus = tf.config.list_physical_devices('GPU')
@@ -33,7 +35,7 @@ def generate(output_directory,
              ckpt_iter,
              use_model,
              masking,
-             missing_k,
+             k_segments_or_k_misssing,
              only_generate_missing):
     
     """
@@ -47,9 +49,9 @@ def generate(output_directory,
                                       automitically selects the maximum iteration if 'max' is selected
     data_path (str):                  path to dataset, numpy array.
     use_model (int):                  0:DiffWave. 1:SSSDSA. 2:SSSDS4.
-    masking (str):                    'mnr': missing not at random, 'bm': black-out, 'rm': random missing
+    masking (str):                    "random missing with length" or "blackout missing with length"
     only_generate_missing (int):      0:all sample diffusion.  1:only apply diffusion to missing portions of the signal
-    missing_k (int)                   k missing time points for each channel across the length.
+    missing_k (int)                   k_segments for "blackout missing with length", e.g., 5; k_misssing for "random missing with length", e.g., 50..
     """
 
     # generate experiment (local) path
@@ -100,38 +102,50 @@ def generate(output_directory,
     ### Custom data loading and reshaping ###
     
     testing_data = np.load(trainset_config['test_data_path'])
-    # testing_data = np.split(testing_data, 11, 0) ### Hang Seng (11, 23, 239, 6)
-    # testing_data = np.split(testing_data, 6, 0)  ### Dow Jones (6, 87, 137, 6)
-    testing_data = np.split(testing_data, 5, 0)  ### Euro (5, 125, 94, 6)
+    testing_data = np.split(testing_data[:-1], 6, 0) ### Hang Seng (546, 103, 6) -> (6, 92, 103, 6)
+    # testing_data = np.split(testing_data[:-1], 5, 0)  ### Dow Jones (520, 137, 6) -> (5, 104, 137, 6)
+    # testing_data = np.split(testing_data[:-1], 6, 0)  ### Euro (618, 94, 6) -> (6, 103, 94, 6)
     testing_data = np.array(testing_data)
     testing_data = np.nan_to_num(testing_data)
     testing_data = tf.constant(testing_data, dtype=tf.float32)
     print('Data loaded', testing_data.shape)
 
     testing_mask = np.load(trainset_config['test_mask_path'])
-    # testing_mask = np.split(testing_mask, 11, 0)
-    # testing_mask = np.split(testing_mask, 6, 0)
-    testing_mask = np.split(testing_mask, 5, 0)
+    testing_mask = np.split(testing_mask[:-1], 6, 0) ### Hang Seng 
+    # testing_mask = np.split(testing_mask[:-1], 5, 0)   ### Dow Jones 
+    # testing_mask = np.split(testing_mask[:-1], 6, 0)   ### Euro
     testing_mask = np.array(testing_mask) 
     print('Mask loaded',  testing_mask.shape)  
 
     all_mse = []
-    test_mse = []
+    all_mae = []
     
-    for i, batch in enumerate(testing_data):
+    for index, batch in enumerate(testing_data):
+        if masking == 'random missing with length':
+            #### generate random mask for each batch
+            mask_batch = testing_mask[index] ### (B, L)
+            masks=[]
+            for j in range(len(mask_batch)):
+                mask = mask_batch[j] ###(L)
+                valid_mask=np.where(mask==1)[0] ### only valid mask will be selected
+                perm = np.random.permutation(valid_mask)
+                idx = perm[0:k_segments_or_k_misssing]
+                mask[idx] = 2.0  #### label missing value as 2
+                masks.append(mask)            
+            masks = np.array(masks) ### (B, L)
 
-        #### generate random mask for each batch
-        mask_batch = testing_mask[i] ### (B, L)
-        masks=[]
-        for j in range(len(mask_batch)):
-            mask = mask_batch[j] ###(L)
-            valid_mask=np.where(mask==1)[0]
-            perm = np.random.permutation(valid_mask)
-            idx = perm[0:missing_k]
-            mask[idx] = 2.0  #### label missing value as 2
-            masks.append(mask)
+        elif masking == 'blackout missing with length':
+            observed_mask = testing_mask[index]### (B, L)
+            masks = []
+            for i in range(len(observed_mask)):
+                mask = observed_mask[i] ###(L)
+                valid_mask = np.where(mask==1)[0]
+                list_of_segments_index = np.array_split(valid_mask, k_segments_or_k_misssing) ### only valid mask will be selected
+                s_nan = random.choice(list_of_segments_index)
+                mask[s_nan] = 2 #### label missing value as 2 
+                masks.append(mask) 
+            masks = np.array(masks) ### (B, L)
 
-        masks = np.array(masks) ### (B, L)
         masks = np.tile(masks[:, :, None], (1, 1, 6)) ###(B, L, C)
         test_mask = masks.copy()
         test_mask[np.where(masks!=1)]=0
@@ -165,16 +179,16 @@ def generate(output_directory,
         batch = batch.numpy()
         # mask = mask.numpy() 
         
-        outfile = f'imputation{i}.npy'
+        outfile = f'imputation{index}.npy'
         new_out = os.path.join(output_directory, outfile)
         np.save(new_out, generated_audio)
 
-        outfile = f'original{i}.npy'
+        outfile = f'original{index}.npy'
         new_out = os.path.join(output_directory, outfile)
         
         np.save(new_out, batch)
 
-        outfile = f'masks{i}.npy'
+        outfile = f'masks{index}.npy'
         new_out = os.path.join(output_directory, outfile)
         np.save(new_out, masks)
 
@@ -183,12 +197,16 @@ def generate(output_directory,
 
         # loss_mask = (1-mask)>0
         mse = mean_squared_error(generated_audio[loss_mask], batch[loss_mask])
-        mse1 = mean_squared_error((generated_audio*loss_mask).flatten(), (batch*loss_mask).flatten())
-        print(mse, mse1)
+        # mse1 = mean_squared_error((generated_audio*loss_mask).flatten(), (batch*loss_mask).flatten())
+        mae = mean_absolute_error(generated_audio[loss_mask], batch[loss_mask])
+        print(mse, mae)
+
         all_mse.append(mse)
-        test_mse.append(mse1)
+        all_mae.append(mae) 
     
-    print('Total MSE:', mean(all_mse), mean(test_mse))
+    print('Total MSE:', mean(all_mse))
+    print('Total MAE:', mean(all_mae))
+    print('RMSE:', math.sqrt(mean(all_mse)))
 
 
 if __name__ == "__main__":
@@ -235,5 +253,5 @@ if __name__ == "__main__":
              use_model=train_config["use_model"],
              data_path=trainset_config["test_data_path"],
              masking=train_config["masking"],
-             missing_k=train_config["missing_k"],
+             k_segments_or_k_misssing=train_config["k_segments_or_k_misssing"],
              only_generate_missing=train_config["only_generate_missing"])

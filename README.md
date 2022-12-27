@@ -33,37 +33,35 @@ python inference.py -c config/config_SSSDS4.json
 | :----:| :----: |
 | 0.59(8)e-3 | [0.53e-3](figures/test_tf_24000_rm.png) |
 
-***2) Train and test on stock dataset with random missing in length with all 6 features (finished on Dec.1).***     
-*Note: some improvements in train_stock.py*         
-1.using different masks for each batch in the same iteration;     
-2.add my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the original PyTorch version using index for valid imputation noise (z[loss_mask]). In the tensorflow verison of train.py, original mse loss directly counts all the mask numbers, although the value is zero for conditional noise (z*loss_mask).     
-
-*Stock data download and preprocess*               
+***2) Train and test on stock dataset with random missing in length with all 6 features (finished on Dec.1).***   
+*Stock data download and preprocess*  (updated on Dec. 27)             
 1.take Hang_Seng for example (stock_data/data.py), download data with tickers, check valid trading days (over 10 years), save 10year stock.txt;     
-2.iterate the weekdays from start to end, mask the trading days with holiday:-1; nan:0; valid:1;     
-3.normalize the raw data with min-max, scale to the [0,1] for each feature, and drop most of the nan data for stocks not on the market in early days;    
+2.iterate the weekdays from start to end, mask the trading days with holiday label:-1; nan label:0; valid label:1;     
+3.normalize the raw data with min-max, scale to the [0,1] for each feature, and drop the batch with many nan data because of some new stocks have not been on the market in early days;    
 4.split into the training dataset (0.8) and testing dataset (0.2).    
 
 | Dataset (iteration, batch, length, feature)| Hang Seng | Dow Jones |  EuroStoxx |
 | :----:| :----: | :----: |  :----: |
-| training size | (78, 13, 239, 6) | (49, 42, 137, 6) | (61, 41, 94, 6) |    
-| testing size| (11, 23, 239, 6) | (6, 87, 137, 6) | (5, 125, 94, 6) |        
+| training size | (73, 30, 103, 6) | (52, 40, 137, 6) | (45, 55, 94, 6) |    
+| testing size| (6, 92, 103, 6) | (5, 104, 137, 6)) | (6, 103, 94, 6) |        
 
-Fast experiment - Hang Seng dataset with missing_k=50
+*Note: some improvements in train_stock.py*         
+1.implemented two masking methods, "blackout missing with length" and "random missing with length", applied on the vaild mask with label 1 and set as missing mask with label 2;       
+2.used different masks for each batch in the same iteration;       
+3.added my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the original PyTorch version using index for valid imputation noise (z[loss_mask]). In the tensorflow verison of train.py, original mse loss directly counts all the mask numbers, although the value is zero for conditional noise (z*loss_mask), will not affect the model training.       
+
+
+Fast experiment - Hang Seng dataset with "blackout missing with length"
 ```
 python train_stock.py -c config/config_SSSDS4_stock.json
 python inference_stock.py -c config/config_SSSDS4_stock.json
 ```
-Fast experiment - Dow Jones dataset with missing_k=30
+Fast experiment - Hang Seng dataset with "random missing with length"
 ```
-python train_stock.py -c config/config_SSSDS4_dow.json
-python inference_stock.py -c config/config_SSSDS4_dow.json
+python train_stock.py -c config/config_SSSDS4_stock_rm.json
+python inference_stock.py -c config/config_SSSDS4_stock_rm.json
 ```
-Fast experiment - EuroStoxx dataset with missing_k=20
-```
-python train_stock.py -c config/config_SSSDS4_euro.json
-python inference_stock.py -c config/config_SSSDS4_euro.json
-```
+
 *IMPUTATION MSE RESULTS*    
 | Hang Seng | Dow Jones | EuroStoxx |
 | :----:| :----: | :----: |
@@ -85,8 +83,8 @@ python inference_stock.py -c config/config_SSSDS4_euro.json
 | PyTorch |  [20% RM + Random strategy](figures/rm_0.2.png)| 0.0102 | 0.0514 | 0.0698| 
 | PyTorch |  [0% RM + fixed 20% Random strategy](figures/fixed_0.2_RS.png)| 0.0114 | 0.0351| 0.0783 |      
                           
-3.I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results are shown in [1],[2],[3]. For CSDI evaluate code, I noticed that it used the median value of 10 samples generated for each test sample to calculate mae and rmse instead of averaged value as in the SSSD paper. I recalculate the averaged value based on the saved generated samples, the MAE and RMSE results are represented by average(median) in Table.      
-4.For implemented Tensorflow code, the training config and  **RM, MNR, BM** masking are same as the modified PyTorch version, which can be changed by commenting/uncommenting in line 570-572(val), 577-579(train), 588-590(evaluate) in imputers/CSDI.py, should be the same for train, val and evaluation. Note that the previous masking function code by SSSD and CSDI authors are reseved, but will not be used for model training. The results are shown in the Table.    
+3.I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results are shown in [1],[2],[3]. For CSDI evaluate code, I noticed that it used the median value of 10 samples generated for each test sample to calculate mae and rmse instead of averaged value as in the SSSD paper. I recalculate the averaged value based on the saved generated samples by using the calculate.py. The overall MAE and RMSE results are represented by average(median) in Table.      
+4.For implemented Tensorflow code, the training config is same as the modified PyTorch version. The **RM, MNR, BM** masking can be changed by commenting/uncommenting in line 570-572(val), 577-579(train), 588-590(evaluate) in imputers/CSDI.py. The same masking should be applied for train, val and evaluation. Note that the previous masking function code by SSSD and CSDI authors are preserved, but will not be used in the model training. The results are shown in the Table.    
 
 Fast experiment - 20% BM on PTB-XL
 ```
@@ -106,10 +104,10 @@ python train_csdi.py
 | PyTorch [3]| [20% BM implemented](figures/csdi_bm.out) | 0.0590(0.0486) | 0.1257(0.1084)| 0.3278 |    
 | Tensorflow | [20% BM implemented](figures/csdi_bm_tf.out) |0.0579 (0.0481)| 0.1240(0.1049) | 0.3279 |   
 
-***1) Train and test on stock dataset (updated on Dec.24)***    
-*Note: some improvements in imputers/CSDI_stock.py*         
-1.write a clear version based on CSDI.py, and deleted all useless functions and config code.       
-2.implemented my own masking methods for the stock data, including "random missing with length" and "blackout missing with length", you can change through the config by setting the target_strategy instead of the comment/uncomment by hand in the previous CSDI.py.
+***2) Train and test on stock dataset (updated on Dec.24)***    
+*Note: some improvements in imputers/CSDI_stock.py compared to the imputers/CSDI.py*         
+1.write a clear version based on *imputers/CSDI.py*, and deleted all useless functions and config code.       
+2.implemented my own masking methods for the stock data, including "random missing with length" and "blackout missing with length", which can be changed through the config by the target_strategy setting instead of the comment/uncomment by hand in the previous *imputers/CSDI.py*.
 
 Fast experiment - Hang Seng dataset with missing_k=50
 ```
