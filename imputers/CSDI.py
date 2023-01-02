@@ -442,7 +442,7 @@ class CSDI_base(keras.Model):
                 cond_mask[i][channel][idx] = 0
         return tf.constant(cond_mask, tf.float32)
 
-    def get_nrm_mask(self, observed_mask, k_segments=5):
+    def get_mnr_mask(self, observed_mask, k_segments=5):
         cond_mask = np.ones(observed_mask.shape)
         length_index = np.array(range(observed_mask.shape[2]))
         list_of_segments_index = np.array_split(length_index, k_segments)
@@ -568,14 +568,14 @@ class CSDI_base(keras.Model):
         if is_train == 0:
             # cond_mask = gt_mask
             # cond_mask = self.get_rm_mask(observed_mask)
-            # cond_mask = self.get_nrm_mask(observed_mask)
+            # cond_mask = self.get_mnr_mask(observed_mask)
             cond_mask = self.get_bm_mask(observed_mask)
         elif self.target_strategy != "random":
             cond_mask = self.get_hist_mask(observed_mask, for_pattern_mask=for_pattern_mask)
         else:
             # cond_mask = self.get_randmask(observed_mask)
             # cond_mask = self.get_rm_mask(observed_mask)
-            # cond_mask = self.get_nrm_mask(observed_mask)
+            # cond_mask = self.get_mnr_mask(observed_mask)
             cond_mask = self.get_bm_mask(observed_mask)
         side_info = self.get_side_info(observed_tp, cond_mask)
         loss_func = self.calc_loss if is_train == 1 else self.calc_loss_valid
@@ -586,7 +586,7 @@ class CSDI_base(keras.Model):
         (observed_data,observed_mask,observed_tp,gt_mask,_,cut_length) = self.process_data(batch)
         # cond_mask = gt_mask
         # cond_mask = self.get_rm_mask(observed_mask)
-        # cond_mask = self.get_nrm_mask(observed_mask)
+        # cond_mask = self.get_mnr_mask(observed_mask)
         cond_mask = self.get_bm_mask(observed_mask)
         target_mask = observed_mask - cond_mask
         side_info = self.get_side_info(observed_tp, cond_mask)

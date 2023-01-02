@@ -20,11 +20,11 @@
         "s4_layernorm":1
     },
     "train_config": {
-        "output_directory": "./results/Dow_Jones/5",
+        "output_directory": "./results/Dow_Jones/5_1227",
         "ckpt_iter": "max",
-        "iters_per_ckpt": 5000,
-        "iters_per_logging": 1000,
-        "n_iters": 10000,
+        "iters_per_ckpt": 50000,
+        "iters_per_logging": 10000,
+        "n_iters": 150000,
         "learning_rate": 2e-4,
         "only_generate_missing": 1,
         "use_model": 2,
@@ -40,7 +40,7 @@
         "sampling_rate": 100
     },
     "gen_config":{
-        "output_directory": "./results/Dow_Jones/5",
-        "ckpt_path": "./results/Dow_Jones/5/"
+        "output_directory": "./results/Dow_Jones/5_1227",
+        "ckpt_path": "./results/Dow_Jones/5_1227/"
     }
 }

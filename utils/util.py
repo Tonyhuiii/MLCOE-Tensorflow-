@@ -223,13 +223,7 @@ def get_mask_mnr(sample, k):
     mask = np.ones(sample.shape)
     length = mask.shape[0]
     length_index = range(length)
-    a=length//k
-    if (length % k ==0):
-        splits=[i*k for i in range(1,a)]
-    else:
-        splits=[i*k for i in range(1,a+1)]
-    list_of_segments_index = np.split(length_index, splits)
-
+    list_of_segments_index = np.array_split(length_index, k)
     for channel in range(mask.shape[1]):
         s_nan = random.choice(list_of_segments_index)
         mask[:, channel][s_nan[0]:s_nan[-1] + 1] = 0
@@ -245,12 +239,7 @@ def get_mask_bm(sample, k):
     mask = np.ones(sample.shape)
     length = mask.shape[0]
     length_index = range(length)
-    a=length//k
-    if (length % k ==0):
-        splits=[i*k for i in range(1,a)]
-    else:
-        splits=[i*k for i in range(1,a+1)]
-    list_of_segments_index = np.split(length_index, splits)
+    list_of_segments_index = np.array_split(length_index, k)
     s_nan = random.choice(list_of_segments_index)
     for channel in range(mask.shape[1]):
         mask[:, channel][s_nan[0]:s_nan[-1] + 1] = 0

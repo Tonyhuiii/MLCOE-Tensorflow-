@@ -9,8 +9,9 @@ from utils.util import find_max_epoch, print_size, sampling, calc_diffusion_hype
 
 from imputers.SSSDS4Imputer import SSSDS4Imputer
 
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from statistics import mean
+import math
 import time
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
@@ -56,9 +57,9 @@ def generate(output_directory,
     local_path = "T{}_beta0{}_betaT{}".format(diffusion_config["T"],
                                               diffusion_config["beta_0"],
                                               diffusion_config["beta_T"])
-
+    local_path1 = 'inference'
     # Get shared output_directory ready
-    output_directory = os.path.join(output_directory, local_path)
+    output_directory = os.path.join(output_directory, local_path1)
     if not os.path.isdir(output_directory):
         os.makedirs(output_directory)
         os.chmod(output_directory, 0o775)
@@ -100,13 +101,16 @@ def generate(output_directory,
     ### Custom data loading and reshaping ###
     
     testing_data = np.load(trainset_config['test_data_path'])
-    testing_data = np.split(testing_data, 4, 0)
+    testing_data = np.split(testing_data, 4, 0)  ### mujoco (4, 500, 100, 14)
+    # testing_data = testing_data[:-3].reshape(-1,12,250,4) ### ptbxl (2200, 12, 250, 4)
+    # testing_data = testing_data.reshape((-1,250,12))   ### ptbxl (8800, 12, 250)
+    # testing_data = np.split(testing_data, 8, 0)  ### ptbxl (8, 1100, 12, 250)
     testing_data = np.array(testing_data)
     testing_data = tf.constant(testing_data, dtype=tf.float32)
-    print('Data loaded')
+    print('Data loaded', testing_data.shape)
 
     all_mse = []
-
+    all_mae = []
     
     for i, batch in enumerate(testing_data):
 
@@ -130,7 +134,8 @@ def generate(output_directory,
 
         sample_length = batch.shape[2]
         sample_channels = batch.shape[1]
-        generated_audio = sampling(net, (num_samples, sample_channels, sample_length),
+        generated_audio = sampling(net, batch.shape,
+                                    # (num_samples, sample_channels, sample_length),
                                    diffusion_hyperparams,
                                    cond=batch,
                                    mask=mask,
@@ -138,7 +143,8 @@ def generate(output_directory,
 
         end=time.time()
 
-        print('generated {} utterances of random_digit at iteration {} in {} mins'.format(num_samples,
+        print('generated {} utterances of random_digit at iteration {} in {} mins'.format(batch.shape[0],
+                                                                                            # num_samples,
                                                                                              ckpt_iter,
                                                                                              (end-start)/60))
 
@@ -147,25 +153,29 @@ def generate(output_directory,
         mask = mask.numpy() 
         
         outfile = f'imputation{i}.npy'
-        new_out = os.path.join(ckpt_path, outfile)
+        new_out = os.path.join(output_directory, outfile)
         np.save(new_out, generated_audio)
 
         outfile = f'original{i}.npy'
-        new_out = os.path.join(ckpt_path, outfile)
+        new_out = os.path.join(output_directory, outfile)
         np.save(new_out, batch)
 
         outfile = f'mask{i}.npy'
-        new_out = os.path.join(ckpt_path, outfile)
+        new_out = os.path.join(output_directory, outfile)
         np.save(new_out, mask)
 
         print('saved generated samples at iteration %s' % ckpt_iter)
 
         loss_mask = (1-mask)>0
         mse = mean_squared_error(generated_audio[loss_mask], batch[loss_mask])
-        all_mse.append(mse)
-    
-    print('Total MSE:', mean(all_mse))
+        mae = mean_absolute_error(generated_audio[loss_mask], batch[loss_mask])
 
+        all_mse.append(mse)
+        all_mae.append(mae)   
+
+    print('Total MAE:', mean(all_mae))
+    print('Total MSE:', mean(all_mse))
+    print('RMSE:', math.sqrt(mean(all_mse)))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

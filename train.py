@@ -9,7 +9,7 @@ from utils.util import get_mask_mnr, get_mask_bm, get_mask_rm
 from tqdm import tqdm
 from imputers.SSSDS4Imputer import SSSDS4Imputer
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -66,10 +66,6 @@ def train(output_directory,
         os.chmod(output_directory, 0o775)
     print("output directory", output_directory, flush=True)
 
-    # map diffusion hyperparameters to gpu
-    # for key in diffusion_hyperparams:
-    #     if key != "T":
-    #         diffusion_hyperparams[key] = diffusion_hyperparams[key].cuda()
 
     # predefine model
     if use_model == 0:
@@ -92,13 +88,7 @@ def train(output_directory,
         try:
             # load checkpoint file
             model_path = os.path.join(output_directory, '{}.pkl'.format(ckpt_iter))
-            checkpoint = torch.load(model_path, map_location='cpu')
-
-            # feed model dict and optimizer state
-            net.load_state_dict(checkpoint['model_state_dict'])
-            if 'optimizer_state_dict' in checkpoint:
-                optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-
+            net.load_weights(model_path).expect_partial()
             print('Successfully loaded model at iteration {}'.format(ckpt_iter))
         except:
             ckpt_iter = -1
@@ -107,24 +97,23 @@ def train(output_directory,
         ckpt_iter = -1
         print('No valid checkpoint model found, start training from initialization.')
 
-        
-        
     
     ### Custom data loading and reshaping ###
     training_data = np.load(trainset_config['train_data_path'])
-    training_data = np.split(training_data, 160, 0)
+    training_data = np.split(training_data, 160, 0)    ### mujoco (160, 50, 100, 14)
+    # training_data = training_data[:-1].reshape(-1,12,250,4) ### ptbxl (17440, 12, 250, 4)
+    # training_data = training_data.reshape((-1,250,12))   ### ptbxl (69760, 250, 12)
+    # training_data = np.split(training_data, 4360, 0)  ###  (4360, 16, 250, 12)
     training_data = np.array(training_data)
-    # training_data = torch.from_numpy(training_data).float().cuda()
     training_data = tf.constant(training_data,dtype=tf.float32)
-    print('Data loaded')
 
-    
+    print('Data loaded', training_data.shape)
     
     # training
+    pbar = tqdm(total=n_iters + 1)
     n_iter = ckpt_iter + 1
     while n_iter < n_iters + 1:
-        for batch in tqdm(training_data):
-
+        for batch in training_data:
             if masking == 'rm':
                 transposed_mask = get_mask_rm(batch[0], missing_k)
             elif masking == 'mnr':
@@ -151,6 +140,9 @@ def train(output_directory,
             if n_iter % iters_per_logging == 0:
                 print("iteration: {} \tloss: {}".format(n_iter, loss))
 
+            if n_iter > 0 and n_iter % iters_per_logging == 0:
+                pbar.update(iters_per_logging)
+
             # save checkpoint
             if n_iter > 0 and n_iter % iters_per_ckpt == 0:
                 checkpoint_name = '{}/{}'.format(n_iter, n_iter)
@@ -161,7 +153,8 @@ def train(output_directory,
                 print('model at iteration %s is saved' % n_iter)
 
             n_iter += 1
-
+            
+    pbar.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

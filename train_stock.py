@@ -5,12 +5,11 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from utils.util import find_max_epoch, print_size, training_stock_loss, calc_diffusion_hyperparams
-from utils.util import get_mask_mnr, get_mask_bm, get_mask_rm
 from tqdm import tqdm
 from imputers.SSSDS4Imputer_stock import SSSDS4Imputer
 import random
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -115,7 +114,7 @@ def train(output_directory,
     training_data = np.load(trainset_config['train_data_path'])
     training_data = np.split(training_data, 73, 0)  ### Hang Seng (2190, 103, 6) -> (73, 30, 103, 6)
     # training_data = np.split(training_data[:-3], 52, 0)  ### Dow Jones (2080, 137, 6) -> (52, 40, 137, 6)
-    # training_data = np.split(training_data[:-2], 45, 0)  ### Euro (2475, 94, 6) -> (45, 55, 94, 6)
+    # training_data = np.split(training_data[:-2], 55, 0)  ### Euro (2475, 94, 6) -> (55, 45, 94, 6)
     training_data = np.array(training_data)
     training_data = np.nan_to_num(training_data)
     training_data = tf.constant(training_data,dtype=tf.float32)
@@ -124,7 +123,7 @@ def train(output_directory,
     training_mask = np.load(trainset_config['train_mask_path'])
     training_mask = np.split(training_mask, 73, 0)   ### Hang Seng
     # training_mask = np.split(training_mask[:-3], 52, 0)  ### Dow Jones 
-    # training_mask = np.split(training_mask[:-2], 45, 0)  ### Euro
+    # training_mask = np.split(training_mask[:-2], 55, 0)  ### Euro
     training_mask = np.array(training_mask) 
     print('Mask loaded',  training_mask.shape)   
     

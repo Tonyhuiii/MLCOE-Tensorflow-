@@ -42,11 +42,11 @@ python inference.py -c config/config_SSSDS4.json
 
 | Dataset (iteration, batch, length, feature)| Hang Seng | Dow Jones |  EuroStoxx |
 | :----:| :----: | :----: |  :----: |
-| training size | (73, 30, 103, 6) | (52, 40, 137, 6) | (45, 55, 94, 6) |    
-| testing size| (6, 92, 103, 6) | (5, 104, 137, 6)) | (6, 103, 94, 6) |        
+| training size | (73, 30, 103, 6) | (52, 40, 137, 6) | (55, 45, 94, 6) |    
+| testing size| (6, 92, 103, 6) | (5, 104, 137, 6) | (6, 103, 94, 6) |        
 
 *Note: some improvements in train_stock.py*         
-1.implemented two masking methods, "blackout missing with length" and "random missing with length", applied on the vaild mask with label 1 and set as missing mask with label 2;       
+1.implemented two masking methods, "blackout missing with length" and "random missing with length", applied on the valid mask with label 1 and set as missing mask with label 2;       
 2.used different masks for each batch in the same iteration;       
 3.added my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the original PyTorch version using index for valid imputation noise (z[loss_mask]). In the tensorflow verison of train.py, original mse loss directly counts all the mask numbers, although the value is zero for conditional noise (z*loss_mask), will not affect the model training.       
 
@@ -62,10 +62,29 @@ python train_stock.py -c config/config_SSSDS4_stock_rm.json
 python inference_stock.py -c config/config_SSSDS4_stock_rm.json
 ```
 
-*IMPUTATION MSE RESULTS*    
-| Hang Seng | Dow Jones | EuroStoxx |
-| :----:| :----: | :----: |
-| [1e-3](figures/Hang_Seng_test.png)| [4.9e-4](figures/Dow_Jones_29_test.png) | [8.9e-4](figures/EuroStoxx_47_test.png) |    
+*Imputation results(updated on Jan.2)*  
+| Stock | Masking(RM or BM with length) | MAE | RMSE|
+| :----: | :----:| :----: | :----: |
+| Hang Seng | k_misssing = 21 | 0.0163 | 0.0253 |
+| Hang Seng | k_segments = 5 | 0.0379 | 0.0595 |       
+| Dow Jones | k_misssing = 28 | 0.0144 | 0.0253| 
+| Dow Jones | k_segments = 5 | 0.0445 | 0.0884 | 
+| EuroStoxx | k_misssing = 19 | 0.0273 | 0.0368| 
+| EuroStoxx | k_segments = 5 | 0.0374 | 0.0603| 
+
+***2) Validate on PTB-XL dataset (Jan.2).***  
+*Imputation results using original PyTorch code and implemented Tensorflow code*  
+| Results | Config | MAE | RMSE|  
+| :----: | :----:| :----: | :----: | 
+| Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 |     
+| PyTorch |  20% RM   | 0.01068 | 0.0368| 
+| Tensorflow | 20% RM  |0.01065 | 0.0360 | 
+| Paper  | 20% MNR| 0.0103±3e-3 | 0.0226±9e-4 |
+| PyTorch | MNR |  | |
+| Tensorflow |  MNR |0.0111| 0.0314 |    
+| Paper  | 20% BM| 0.0324±3e-3 | 0.0832±8e-3 | 
+| PyTorch |  20% BM  | 0.0475 | 0.1050| 
+| Tensorflow | 20% BM  |0.0488| 0.1103 |  
 
 
 #### ● Tensorflow implementation of CSDI   (finished code on Nov.26)
@@ -114,15 +133,15 @@ Fast experiment - Hang Seng dataset with "random missing with length", k_misssin
 python train_csdi_stock.py
 ```
 
-*Imputation results*  
+*Imputation results(updated on Dec.27)*  
 | Stock | Masking(RM or BM with length) | MAE | RMSE|
 | :----: | :----:| :----: | :----: |
-| Hang Seng | k_misssing = 21 | 0.0071 | 0.0160 |
-| Hang Seng | k_segments = 5 | 0.0205 | 0.0344 |       
-| Dow Jones | k_misssing = 28 | 0.0052 | 0.0150| 
-| Dow Jones | k_segments = 5 | 0.0128 | 0.0260 | 
-| EuroStoxx | k_misssing = 19 | 0.008 | 0.0213| 
-| EuroStoxx | k_segments = 5 | 0.0204 | 0.0353| 
+| Hang Seng | k_misssing = 21 | 0.0079(0.0071) | 0.0170(0.0160) |
+| Hang Seng | k_segments = 5 | 0.0226(0.0205) | 0.0379(0.0344) |       
+| Dow Jones | k_misssing = 28 | 0.0058(0.0052) | 0.0169(0.0150)| 
+| Dow Jones | k_segments = 5 | 0.0139(0.0128) | 0.0283(0.0260) | 
+| EuroStoxx | k_misssing = 19 | 0.0092(0.008) | 0.0247(0.0213)| 
+| EuroStoxx | k_segments = 5 | 0.0225(0.0204) | 0.0390(0.0353)| 
 
 ### Part 2 Bonus question  (if have time after finishing part 1)
 ● Bonus question 1 (Jan. 7, 2023)       

@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 import tensorflow as tf
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -15,8 +15,10 @@ if gpus:
     # Memory growth must be set before GPUs have been initialized
     print(e)
 
-res = open('csdi_bm_test/generated_outputs_nsample10.pk','rb')
-# res = open('csdi_stock_test/generated_outputs_nsample10.pk','rb')
+# res = open('csdi_stock/dow_bm/generated_outputs_nsample3.pk','rb')
+# res = open('csdi_stock/hang_seng_bm/generated_outputs_nsample3.pk','rb')
+res = open('csdi_stock/euro_bm/generated_outputs_nsample3.pk','rb')
+# res = open('csdi_rm_test/generated_outputs_nsample10.pk','rb')
 a= pickle.load(res)
 all_generated_samples=tf.cast(a[0],tf.float32)
 all_target=a[1]
@@ -28,7 +30,8 @@ all_observed_time=a[4]
 mse_total = 0
 mae_total = 0
 evalpoints_total = 0
-for i in range(10):
+n_sample = 3
+for i in range(n_sample):
     mse_current = ((all_generated_samples[:,i,:,:] - all_target) * all_evalpoint) ** 2
     mae_current = tf.math.abs((all_generated_samples[:,i,:,:] - all_target) * all_evalpoint) 
     # print(mse_current, mae_current)
@@ -36,10 +39,11 @@ for i in range(10):
     mae_total += tf.reduce_sum(mae_current)
     evalpoints_total += tf.reduce_sum(all_evalpoint)
 
+mae = (mae_total/ evalpoints_total).numpy()
 mse = (mse_total / evalpoints_total).numpy()
 rmse = np.sqrt(mse_total / evalpoints_total)
-mae = (mae_total/ evalpoints_total).numpy()
-print('mse:{}, rmse:{}, mae:{}'.format(mse, rmse, mae))
+
+print('mae:{}, mse:{}, rmse:{}'.format(mae, mse, rmse))
 
 # def quantile_loss(target, forecast, q: float, eval_points) -> float:
 

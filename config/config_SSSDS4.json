@@ -22,8 +22,8 @@
     "train_config": {
         "output_directory": "./results/mujoco/90",
         "ckpt_iter": "max",
-        "iters_per_ckpt": 10000,
-        "iters_per_logging": 1000,
+        "iters_per_ckpt": 50000,
+        "iters_per_logging": 10000,
         "n_iters": 150000,
         "learning_rate": 2e-4,
         "only_generate_missing": 1,

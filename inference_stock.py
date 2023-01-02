@@ -15,7 +15,7 @@ import time
 import random
 import math
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -102,7 +102,7 @@ def generate(output_directory,
     ### Custom data loading and reshaping ###
     
     testing_data = np.load(trainset_config['test_data_path'])
-    testing_data = np.split(testing_data[:-1], 6, 0) ### Hang Seng (546, 103, 6) -> (6, 92, 103, 6)
+    testing_data = np.split(testing_data[:-1], 6, 0)    ### Hang Seng (546, 103, 6) -> (6, 92, 103, 6)
     # testing_data = np.split(testing_data[:-1], 5, 0)  ### Dow Jones (520, 137, 6) -> (5, 104, 137, 6)
     # testing_data = np.split(testing_data[:-1], 6, 0)  ### Euro (618, 94, 6) -> (6, 103, 94, 6)
     testing_data = np.array(testing_data)
@@ -111,7 +111,7 @@ def generate(output_directory,
     print('Data loaded', testing_data.shape)
 
     testing_mask = np.load(trainset_config['test_mask_path'])
-    testing_mask = np.split(testing_mask[:-1], 6, 0) ### Hang Seng 
+    testing_mask = np.split(testing_mask[:-1], 6, 0)     ### Hang Seng 
     # testing_mask = np.split(testing_mask[:-1], 5, 0)   ### Dow Jones 
     # testing_mask = np.split(testing_mask[:-1], 6, 0)   ### Euro
     testing_mask = np.array(testing_mask) 
@@ -199,13 +199,13 @@ def generate(output_directory,
         mse = mean_squared_error(generated_audio[loss_mask], batch[loss_mask])
         # mse1 = mean_squared_error((generated_audio*loss_mask).flatten(), (batch*loss_mask).flatten())
         mae = mean_absolute_error(generated_audio[loss_mask], batch[loss_mask])
-        print(mse, mae)
+        # print(mse, mae)
 
         all_mse.append(mse)
         all_mae.append(mae) 
-    
+
+    print('Total MAE:', mean(all_mae))    
     print('Total MSE:', mean(all_mse))
-    print('Total MAE:', mean(all_mae))
     print('RMSE:', math.sqrt(mean(all_mse)))
 
 
