@@ -72,7 +72,12 @@ python inference_stock.py -c config/config_SSSDS4_stock_rm.json
 | EuroStoxx | k_misssing = 19 | 0.0273 | 0.0368| 
 | EuroStoxx | k_segments = 5 | 0.0374 | 0.0603| 
 
-***2) Validate on PTB-XL dataset (Jan.2).***  
+***3) Validate on PTB-XL dataset (Jan.2).***      
+Fast experiment - PTB-XL dataset under 20% MNR (comment line 103, uncomment line 104-106 in train.py/inference.py)
+```
+python train.py -c config/config_SSSDS4_ptbxl_mnr.json
+python inference.py -c config/config_SSSDS4_ptbxl_mnr.json
+```
 *Imputation results using original PyTorch code and implemented Tensorflow code*  
 | Results | Config | MAE | RMSE|  
 | :----: | :----:| :----: | :----: | 
@@ -80,8 +85,8 @@ python inference_stock.py -c config/config_SSSDS4_stock_rm.json
 | PyTorch |  20% RM   | 0.01068 | 0.0368| 
 | Tensorflow | 20% RM  |0.01065 | 0.0360 | 
 | Paper  | 20% MNR| 0.0103±3e-3 | 0.0226±9e-4 |
-| PyTorch | MNR |  | |
-| Tensorflow |  MNR |0.0111| 0.0314 |    
+| PyTorch | 20% MNR |  | |
+| Tensorflow |  20% MNR |0.0111| 0.0314 |    
 | Paper  | 20% BM| 0.0324±3e-3 | 0.0832±8e-3 | 
 | PyTorch |  20% BM  | 0.0475 | 0.1050| 
 | Tensorflow | 20% BM  |0.0488| 0.1103 |  
@@ -144,8 +149,8 @@ python train_csdi_stock.py
 | EuroStoxx | k_segments = 5 | 0.0225(0.0204) | 0.0390(0.0353)| 
 
 ### Part 2 Bonus question  (if have time after finishing part 1)
-● Bonus question 1 (Jan. 7, 2023)       
-● Bonus question 2 (Jan. 27, 2023)
+● Bonus question 1       
+● Bonus question 2 
 
 
 

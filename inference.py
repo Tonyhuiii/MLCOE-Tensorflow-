@@ -99,7 +99,6 @@ def generate(output_directory,
         
         
     ### Custom data loading and reshaping ###
-    
     testing_data = np.load(trainset_config['test_data_path'])
     testing_data = np.split(testing_data, 4, 0)  ### mujoco (4, 500, 100, 14)
     # testing_data = testing_data[:-3].reshape(-1,12,250,4) ### ptbxl (2200, 12, 250, 4)
