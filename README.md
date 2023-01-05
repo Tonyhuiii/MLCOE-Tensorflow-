@@ -62,15 +62,15 @@ python train_stock.py -c config/config_SSSDS4_stock_rm.json
 python inference_stock.py -c config/config_SSSDS4_stock_rm.json
 ```
 
-*Imputation results(updated on Jan.2)*  
-| Stock | Masking(RM or BM with length) | MAE | RMSE|
+*Imputation results(averaged MAE, RMSE for 3 samples generated for each test sample, updated on Jan.5)*  
+| Stock | Masking(RM or BM with length) | MAE(average)| RMSE(average)|
 | :----: | :----:| :----: | :----: |
-| Hang Seng | k_misssing = 21 | 0.0163 | 0.0253 |
-| Hang Seng | k_segments = 5 | 0.0379 | 0.0595 |       
-| Dow Jones | k_misssing = 28 | 0.0144 | 0.0253| 
-| Dow Jones | k_segments = 5 | 0.0445 | 0.0884 | 
-| EuroStoxx | k_misssing = 19 | 0.0273 | 0.0368| 
-| EuroStoxx | k_segments = 5 | 0.0374 | 0.0603| 
+| Hang Seng | k_misssing = 21 | 0.0162 | 0.0249 |
+| Hang Seng | k_segments = 5 | 0.0389 | 0.0607 |       
+| Dow Jones | k_misssing = 28 | 0.0144 | 0.0250| 
+| Dow Jones | k_segments = 5 | 0.0441 | 0.0866 | 
+| EuroStoxx | k_misssing = 19 | 0.0274 | 0.0377| 
+| EuroStoxx | k_segments = 5 | 0.0366 | 0.0597| 
 
 ***3) Validate on PTB-XL dataset (Jan.2).***      
 Fast experiment - PTB-XL dataset under 20% MNR (comment line 103, uncomment line 104-106 in train.py/inference.py)
@@ -78,55 +78,72 @@ Fast experiment - PTB-XL dataset under 20% MNR (comment line 103, uncomment line
 python train.py -c config/config_SSSDS4_ptbxl_mnr.json
 python inference.py -c config/config_SSSDS4_ptbxl_mnr.json
 ```
-*Imputation results using original PyTorch code and implemented Tensorflow code*  
+*Imputation results using original PyTorch code and implemented Tensorflow code (one sample, one trial, updated on Jan.5)*  
 | Results | Config | MAE | RMSE|  
 | :----: | :----:| :----: | :----: | 
 | Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 |     
-| PyTorch |  20% RM   | 0.01068 | 0.0368| 
-| Tensorflow | 20% RM  |0.01065 | 0.0360 | 
-| Paper  | 20% MNR| 0.0103±3e-3 | 0.0226±9e-4 |
-| PyTorch | 20% MNR |  | |
-| Tensorflow |  20% MNR |0.0111| 0.0314 |    
-| Paper  | 20% BM| 0.0324±3e-3 | 0.0832±8e-3 | 
-| PyTorch |  20% BM  | 0.0475 | 0.1050| 
-| Tensorflow | 20% BM  |0.0488| 0.1103 |  
+| PyTorch |  20% RM   | 0.0046 | 0.0213| 
+| Tensorflow | 20% RM  | 0.0048|  0.0196| 
+| Paper  | 20% MNR| 0.0103±3e-3	 | 0.0226±9e-4 |
+| PyTorch | 20% MNR | 0.0190 |0.0636 |
+| Tensorflow |  20% MNR | 0.0202	| 0.077  |    
+| Paper  | 20% BM|  0.0324±3e-3	| 0.0832±8e-3 | 
+| PyTorch |  20% BM  | 0.0619	 | 0.164| 
+| Tensorflow | 20% BM  | 0.0608	| 0.162 |  
 
+Fast experiment - generated 10 samples for each test sample, referenced from the CSDI code (updated on Jan. 5)  
+```
+python inference_nsamples.py -c config/config_SSSDS4_ptbxl_mnr.json
+```
+*Imputation results using the median value of 10 samples generated for each test sample (waiting 40 hours for imputation!!!)*  
+| Results | Config | MAE | RMSE| CRPS |
+| :----: | :----:| :----: | :----: | :----: | 
+| Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 | 0.0282±1e-3 | 
+| PyTorch |  20% RM   | | | |
+| Tensorflow | 20% RM  | |  |   |
+| Paper | 20% MNR| 0.0103±3e-3| 0.0226±9e-4 | 0.0787±3e-3 |  
+| PyTorch |  20% MNR   | | | |
+| Tensorflow | 20% MNR  | |  |   |
+| Paper | 20% BM|  0.0324±3e-3| 0.0832±8e-3 | 0.2689±3e-3 |   
+| PyTorch |  20% BM   | | | |
+| Tensorflow | 20% BM  | |  |   |
 
 #### ● Tensorflow implementation of CSDI   (finished code on Nov.26)
 *Bug: the training loss didn't decrease. (solved on Dec.21, correct the mistake for tensor shape not changing after the transformer encoder layer)*&#x2705;              
 
 ***1) 20% RM, MNR, BM on PTB-XL (CSDI) (updated on Dec.13)***     
-*Note: cannot reproduce the results using original PyTorch code with same training config.*         
+*Note: cannot reproduce the results using original PyTorch code with same training config.(**dataset with wrong tensor shape was used at that time**)*         
 1.data length: should be 1000 or 250? For PTB-XL 1000 dataset, **considered L = 250 time steps** is mentioned in the paper. However, the table in the original paper shows training batch 4 with sample length 1000. Using this dataset config, **NVIDIA RTX3090 24GB out of memory** , which should be same for NVIDIA A30 cards with 24GB memory that author used. For training config, sample length is set to 250, batch size is set to 32.       
 2.confusing masking config: In CSDI PyTorch code modified by SSSD authors, the code for **RM, MNR, BM** initialization in dataset are added, but the masks will not change in training. Also I found the RM code is not same as the RM definition in SSSD paper and SSSD code. However, the original code for **random strategy** (missing ratios [0%, 100%]) or **historical strategy** in CSDI paper is still maintained in the CSDI model, which will change the mask during the training. I have tried the two combination of the training settings in original code, the results are shown in the Table.
 
-*Imputation results using orignal CSDI PyTorch code and masking settings*  
+*Imputation results using orignal CSDI PyTorch code and masking settings (**previous wrong results using the dataset with wrong tensor shape**)*  
 | Results | Config | MAE | RMSE|  CRPS |
 | :----: | :----:| :----: | :----: |  :----: |
 | Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
 | PyTorch |  [20% RM + Random strategy](figures/rm_0.2.png)| 0.0102 | 0.0514 | 0.0698| 
 | PyTorch |  [0% RM + fixed 20% Random strategy](figures/fixed_0.2_RS.png)| 0.0114 | 0.0351| 0.0783 |      
                           
-3.I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results are shown in [1],[2],[3]. For CSDI evaluate code, I noticed that it used the median value of 10 samples generated for each test sample to calculate mae and rmse instead of averaged value as in the SSSD paper. I recalculate the averaged value based on the saved generated samples by using the calculate.py. The overall MAE and RMSE results are represented by average(median) in Table.      
+3.I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results are shown in [1],[2],[3]. For CSDI evaluate code, I noticed that it used the median value of 10 samples generated for each test sample to calculate mae and rmse, while only the averaged value mentioned in the SSSD paper. Need to finish all experiment to figure out which one is more close to the paper results.      
 4.For implemented Tensorflow code, the training config is same as the modified PyTorch version. The **RM, MNR, BM** masking can be changed by commenting/uncommenting in line 570-572(val), 577-579(train), 588-590(evaluate) in imputers/CSDI.py. The same masking should be applied for train, val and evaluation. Note that the previous masking function code by SSSD and CSDI authors are preserved, but will not be used in the model training. The results are shown in the Table.    
+5.I made a stupid mistake when I reshape the data length 1000 using (250, 4) instead of (4, 250). All the CSDI results before Jan. 2 are wrong because the tensor shape of training dataset are wrong. I have to run all the ptbxl experiments again. I suddenly found the misktake this week when I draw the imputation figures. And I also found that the results based on the median value of 10 samples generated for each sample are close to the paper results. Anyway let me redo all the experiment first (updated on Jan. 5).     
 
 Fast experiment - 20% BM on PTB-XL
 ```
 python train_csdi.py
 ```
 
-*Imputation results using CSDI PyTorch code and implemented Tensorflow code with the same modified masking*  
+*Imputation results using CSDI PyTorch code and implemented Tensorflow code with the same modified masking (**using the dataset with correct tensor shape**)*  
 | Results | Config | MAE | RMSE|  CRPS |
 | :----: | :----:| :----: | :----: |  :----: |
 | Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
-| PyTorch [1]|  [20% RM implemented](figures/rm_newversion_0.2.png)  | 0.0168(0.0139) | 0.0470(0.0390)| 0.0928 | 
-| Tensorflow | [20% RM implemented](figures/csdi_rm_tf.out) |0.0125(0.0104) | 0.0398(0.0320) | 0.0718 |      
+| PyTorch [1]|  [20% RM implemented] |  | |  | 
+| Tensorflow | [20% RM implemented] | |  |  |      
 | Paper  | 20% MNR| 0.0186±1e-5 | 0.0435±2e-4 | 0.1306±5e-5 | 
-| PyTorch [2] | [20% MNR implemented](figures/csdi_nrm.out)| 0.0158(0.0136) | 0.0553(0.0397)| 0.0918 | 
-| Tensorflow | [20% MNR implemented](figures/csdi_nrm_tf.out) |0.0098(0.0084)| 0.0301(0.0230) | 0.0582 |    
+| PyTorch [2] | [20% MNR implemented]|  | |  | 
+| Tensorflow | [20% MNR implemented] |  |  |  |    
 | Paper  | 20% BM| 0.1054±4e-5 | 0.2254±7e-5 | 0.7468±2e-4 |   
-| PyTorch [3]| [20% BM implemented](figures/csdi_bm.out) | 0.0590(0.0486) | 0.1257(0.1084)| 0.3278 |    
-| Tensorflow | [20% BM implemented](figures/csdi_bm_tf.out) |0.0579 (0.0481)| 0.1240(0.1049) | 0.3279 |   
+| PyTorch [3]| [20% BM implemented] |  | |  |    
+| Tensorflow | [20% BM implemented] ||  |  |   
 
 ***2) Train and test on stock dataset (updated on Dec.24)***    
 *Note: some improvements in imputers/CSDI_stock.py compared to the imputers/CSDI.py*         
@@ -138,8 +155,8 @@ Fast experiment - Hang Seng dataset with "random missing with length", k_misssin
 python train_csdi_stock.py
 ```
 
-*Imputation results(updated on Dec.27)*  
-| Stock | Masking(RM or BM with length) | MAE | RMSE|
+*Imputation results (updated on Dec.27)*  
+| Stock | Masking(RM or BM with length) | MAE(average/median)| RMSE(average/median)|
 | :----: | :----:| :----: | :----: |
 | Hang Seng | k_misssing = 21 | 0.0079(0.0071) | 0.0170(0.0160) |
 | Hang Seng | k_segments = 5 | 0.0226(0.0205) | 0.0379(0.0344) |       
@@ -155,4 +172,4 @@ python train_csdi_stock.py
 
 
 ## Acknowledgments 
-Code is based on Pytorch implementation of the original paper (https://github.com/AI4HealthUOL/SSSD).
+Code is based on PyTorch implementation of the original paper (https://github.com/AI4HealthUOL/SSSD).
