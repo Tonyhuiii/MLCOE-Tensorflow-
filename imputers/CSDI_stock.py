@@ -615,7 +615,7 @@ def get_dataloader_train_impute(series,
 
     test_dataset = Custom_Train_Dataset(series=series, masks=masks, use_index_list=te_i).getdata()
     test_loader = tf.data.Dataset.from_tensor_slices(test_dataset)  
-    test_loader = test_loader.shuffle(len(test_loader), reshuffle_each_iteration=True).cache()
+    # test_loader = test_loader.shuffle(len(test_loader), reshuffle_each_iteration=True).cache()
     test_loader = test_loader.batch(batch_size, num_parallel_calls=tf.data.AUTOTUNE)
     test_loader = test_loader.prefetch(tf.data.AUTOTUNE)
 
@@ -806,10 +806,10 @@ class CSDIImputer:
                                              batch_size=config['train']['batch_size'])
 
         model = CSDI_Custom(config, target_dim=self.series_impute.shape[2])
-        output = model({
-            "observed_data": tf.ones([8, 239, 6]),
-            "observed_mask": tf.ones([8, 239]),
-            "timepoints": tf.ones([8, 239])})
+        # output = model({
+        #     "observed_data": tf.ones([8, 103, 6]),
+        #     "observed_mask": tf.ones([8, 103]),
+        #     "timepoints": tf.ones([8, 103])})
 
         model.load_weights(self.path_load_model_dic)
 

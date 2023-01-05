@@ -7,24 +7,8 @@ from tqdm import tqdm
 import pickle
 import math
 import json
-import time
-# import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-# gpus = tf.config.list_physical_devices('GPU')
-# if gpus:
-#   try:
-#     # Currently, memory growth needs to be the same across GPUs
-#     for gpu in gpus:
-#       tf.config.experimental.set_memory_growth(gpu, True)
-#     logical_gpus = tf.config.list_logical_devices('GPU')
-#     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-#   except RuntimeError as e:
-#     # Memory growth must be set before GPUs have been initialized
-#     print(e)
 
 ''' Standalone CSDI imputer. The imputer class is located in the last part of the notebook, please see more documentation there'''
-
-
 
 def train(model, config, train_loader, valid_loader=None, valid_epoch_interval=50, path_save=""):
 
@@ -56,9 +40,10 @@ def train(model, config, train_loader, valid_loader=None, valid_epoch_interval=5
                 avg_loss += loss.numpy()
 
                 it.set_postfix(ordered_dict={"avg_epoch_loss": avg_loss / batch_no,"epoch": epoch_no + 1},refresh=False)
-    
-        output_path = path_save+'/{}/{}'.format(epoch_no, epoch_no)
-        model.save_weights(output_path)
+                
+        if (epoch_no + 1) % valid_epoch_interval == 0:    
+            output_path = path_save+'/{}/{}'.format(epoch_no, epoch_no)
+            model.save_weights(output_path)
 
         if valid_loader is not None and (epoch_no + 1) % valid_epoch_interval == 0:
             avg_loss_valid = 0
@@ -810,13 +795,13 @@ def get_dataloader_train_impute(series,
     valid_loader = tf.data.Dataset.from_tensor_slices(valid_dataset)  
     valid_loader = valid_loader.shuffle(len(valid_loader), reshuffle_each_iteration=True).cache()
     valid_loader = valid_loader.batch(batch_size, num_parallel_calls=tf.data.AUTOTUNE)
-    valid_loader = valid_loader.prefetch(tf.data.AUTOTUNE )
+    valid_loader = valid_loader.prefetch(tf.data.AUTOTUNE)
 
     test_dataset = Custom_Train_Dataset(series=series, use_index_list=te_i, 
                                         missing_ratio_or_k=missing_ratio_or_k, 
                                         masking=masking, path_save=path_save).getdata()
     test_loader = tf.data.Dataset.from_tensor_slices(test_dataset)  
-    test_loader = test_loader.shuffle(len(test_loader), reshuffle_each_iteration=True).cache()
+    # test_loader = test_loader.shuffle(len(test_loader), reshuffle_each_iteration=True).cache()
     test_loader = test_loader.batch(batch_size, num_parallel_calls=tf.data.AUTOTUNE)
     test_loader = test_loader.prefetch(tf.data.AUTOTUNE)
 
@@ -828,7 +813,6 @@ def get_dataloader_impute(series, mask, batch_size=4, len_dataset=100):
     impute_dataset = Custom_Impute_Dataset(series=series, use_index_list=indlist,mask=mask).getdata()
     impute_loader = tf.data.Dataset.from_tensor_slices(impute_dataset)  
     impute_loader = impute_loader.batch(batch_size)    
-    # impute_loader = DataLoader(impute_dataset, batch_size=batch_size, shuffle=False)
 
     return impute_loader
 

@@ -73,7 +73,7 @@ python inference_stock.py -c config/config_SSSDS4_stock_rm.json
 | EuroStoxx | k_segments = 5 | 0.0366 | 0.0597| 
 
 ***3) Validate on PTB-XL dataset (Jan.2).***      
-Fast experiment - PTB-XL dataset under 20% MNR (comment line 103, uncomment line 104-106 in train.py/inference.py)
+Fast experiment - PTB-XL dataset under 20% MNR (comment line 103, uncomment line 104-107 in train.py/inference.py)
 ```
 python train.py -c config/config_SSSDS4_ptbxl_mnr.json
 python inference.py -c config/config_SSSDS4_ptbxl_mnr.json
@@ -82,14 +82,14 @@ python inference.py -c config/config_SSSDS4_ptbxl_mnr.json
 | Results | Config | MAE | RMSE|  
 | :----: | :----:| :----: | :----: | 
 | Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 |     
-| PyTorch |  20% RM   | 0.0046 | 0.0213| 
-| Tensorflow | 20% RM  | 0.0048|  0.0196| 
+| PyTorch |  [20% RM](figures_new/ptbxl_sssd/rm_inference_pytorch.out)   | 0.0046 | 0.0213| 
+| Tensorflow | [20% RM](figures_new/ptbxl_sssd/rm_inference_tensorflow.out)  | 0.0048|  0.0196| 
 | Paper  | 20% MNR| 0.0103±3e-3	 | 0.0226±9e-4 |
-| PyTorch | 20% MNR | 0.0190 |0.0636 |
-| Tensorflow |  20% MNR | 0.0202	| 0.077  |    
+| PyTorch | [20% MNR](figures_new/ptbxl_sssd/mnr_inference_pytorch.out) | 0.0190 |0.0636 |
+| Tensorflow |  [20% MNR](figures_new/ptbxl_sssd/mnr_inference_tensorflow.out) | 0.0202	| 0.077  |    
 | Paper  | 20% BM|  0.0324±3e-3	| 0.0832±8e-3 | 
-| PyTorch |  20% BM  | 0.0619	 | 0.164| 
-| Tensorflow | 20% BM  | 0.0608	| 0.162 |  
+| PyTorch |  [20% BM](figures_new/ptbxl_sssd/bm_inference_pytorch.out)  | 0.0619| 0.164| 
+| Tensorflow | [20% BM]  | 0.0608	| 0.162 |  
 
 Fast experiment - generated 10 samples for each test sample, referenced from the CSDI code (updated on Jan. 5)  
 ```
@@ -165,6 +165,15 @@ python train_csdi_stock.py
 | EuroStoxx | k_misssing = 19 | 0.0092(0.008) | 0.0247(0.0213)| 
 | EuroStoxx | k_segments = 5 | 0.0225(0.0204) | 0.0390(0.0353)| 
 
+**Figure: 20% BM on Hang Seng**
+![](figures_new/hang_seng_bm/csdi_9.png)
+![](figures_new/hang_seng_bm/sssd_9.png)
+**Figure: 20% BM on Dow Jones**
+![](figures_new/dow_bm/csdi_48.png)
+![](figures_new/dow_bm/sssd_48.png)
+**Figure: 20% RM on EuroStoxx**
+![](figures_new/euro_rm/csdi_1.png)
+![](figures_new/euro_rm/sssd_1.png)
 ### Part 2 Bonus question  (if have time after finishing part 1)
 ● Bonus question 1       
 ● Bonus question 2 
