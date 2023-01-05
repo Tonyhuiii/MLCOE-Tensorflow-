@@ -101,9 +101,10 @@ def train(output_directory,
     ### Custom data loading and reshaping ###
     training_data = np.load(trainset_config['train_data_path'])
     training_data = np.split(training_data, 160, 0)    ### mujoco (160, 50, 100, 14)
-    # training_data = training_data[:-1].reshape(-1,12,250,4) ### ptbxl (17440, 12, 250, 4)
-    # training_data = training_data.reshape((-1,250,12))   ### ptbxl (69760, 250, 12)
-    # training_data = np.split(training_data, 4360, 0)  ###  (4360, 16, 250, 12)
+    # training_data = training_data[:-1].reshape(-1,12,4,250) ### ptbxl (17440, 12, 4, 250)
+    # training_data = training_data.transpose(0,2,3,1)        ### ptbxl (17440, 4, 250, 12)
+    # training_data = training_data.reshape((-1,250,12))      ### ptbxl (69760, 250, 12)
+    # training_data = np.split(training_data, 4360, 0)        ### ptbxl (4360, 16, 250, 12)
     training_data = np.array(training_data)
     training_data = tf.constant(training_data,dtype=tf.float32)
 

@@ -101,9 +101,10 @@ def generate(output_directory,
     ### Custom data loading and reshaping ###
     testing_data = np.load(trainset_config['test_data_path'])
     testing_data = np.split(testing_data, 4, 0)  ### mujoco (4, 500, 100, 14)
-    # testing_data = testing_data[:-3].reshape(-1,12,250,4) ### ptbxl (2200, 12, 250, 4)
-    # testing_data = testing_data.reshape((-1,250,12))   ### ptbxl (8800, 12, 250)
-    # testing_data = np.split(testing_data, 8, 0)  ### ptbxl (8, 1100, 12, 250)
+    # testing_data = testing_data[:-3].reshape(-1,12,4,250) ### ptbxl (2200, 12, 4, 250)
+    # testing_data = testing_data.transpose(0,2,3,1)        ### ptbxl (2200, 4, 250, 12)
+    # testing_data = testing_data.reshape((-1,250,12))      ### ptbxl (8800, 250, 12)
+    # testing_data = np.split(testing_data, 16, 0)           ### ptbxl (16, 550, 250, 12)
     testing_data = np.array(testing_data)
     testing_data = tf.constant(testing_data, dtype=tf.float32)
     print('Data loaded', testing_data.shape)

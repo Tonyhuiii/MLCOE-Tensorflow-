@@ -1,0 +1,58 @@
+CUDA extension for cauchy multiplication not found. Install by going to extensions/cauchy/ and running `python setup.py install`. This should speed up end-to-end training by 10-50%
+Falling back on slow Cauchy kernel. Install at least one of pykeops or the CUDA extension for efficiency.
+{'diffusion_config': {'T': 200, 'beta_0': 0.0001, 'beta_T': 0.02}, 'wavenet_config': {'in_channels': 12, 'out_channels': 12, 'num_res_layers': 36, 'res_channels': 256, 'skip_channels': 256, 'diffusion_step_embed_dim_in': 128, 'diffusion_step_embed_dim_mid': 512, 'diffusion_step_embed_dim_out': 512, 's4_lmax': 250, 's4_d_state': 64, 's4_dropout': 0.0, 's4_bidirectional': 1, 's4_layernorm': 1}, 'train_config': {'output_directory': './results/ptbxl/mnr', 'ckpt_iter': 'max', 'iters_per_ckpt': 50000, 'iters_per_logging': 10000, 'n_iters': 150000, 'learning_rate': 0.0002, 'only_generate_missing': 1, 'use_model': 2, 'masking': 'mnr', 'missing_k': 50}, 'trainset_config': {'train_data_path': './datasets/train_ptbxl_1000.npy', 'test_data_path': './datasets/test_ptbxl_1000.npy', 'segment_length': 250, 'sampling_rate': 100}, 'gen_config': {'output_directory': './results/ptbxl/mnr', 'ckpt_path': './results/ptbxl/mnr/'}}
+output directory ./results/ptbxl/mnr/T200_beta00.0001_betaT0.02
+SSSDS4Imputer Parameters: 48.296972M
+Successfully loaded model at iteration 150000
+Data loaded
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 734 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 734 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 736 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 736 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 736 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 735 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 735 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 733 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 732 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 733 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 733 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 733 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 732 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 733 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 733 seconds
+saved generated samples at iteration 150000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 150000 in 732 seconds
+saved generated samples at iteration 150000
+Total MAE: 0.019043693
+Total MSE: 0.0040446576
+RMSE: 0.06359762238561993

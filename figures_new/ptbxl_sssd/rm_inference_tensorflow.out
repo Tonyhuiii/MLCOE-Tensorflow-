@@ -1,0 +1,70 @@
+2023-01-05 12:17:55.668542: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-01-05 12:17:55.813676: I tensorflow/core/util/port.cc:104] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2023-01-05 12:17:56.429092: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory
+2023-01-05 12:17:56.429173: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory
+2023-01-05 12:17:56.429185: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+2023-01-05 12:17:57.461670: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-01-05 12:17:58.114789: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1613] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22278 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 3090, pci bus id: 0000:af:00.0, compute capability: 8.6
+1 Physical GPUs, 1 Logical GPUs
+{'diffusion_config': {'T': 200, 'beta_0': 0.0001, 'beta_T': 0.02}, 'wavenet_config': {'in_channels': 12, 'out_channels': 12, 'num_res_layers': 36, 'res_channels': 256, 'skip_channels': 256, 'diffusion_step_embed_dim_in': 128, 'diffusion_step_embed_dim_mid': 512, 'diffusion_step_embed_dim_out': 512, 's4_lmax': 250, 's4_d_state': 64, 's4_dropout': 0.0, 's4_bidirectional': 1, 's4_layernorm': 1}, 'train_config': {'output_directory': './results/ptbxl/rm', 'ckpt_iter': 'max', 'iters_per_ckpt': 100000, 'iters_per_logging': 10000, 'n_iters': 300000, 'learning_rate': 0.0002, 'only_generate_missing': 1, 'use_model': 2, 'masking': 'rm', 'missing_k': 50}, 'trainset_config': {'train_data_path': './datasets/train_ptbxl_1000.npy', 'test_data_path': './datasets/test_ptbxl_1000.npy', 'segment_length': 250, 'sampling_rate': 100}, 'gen_config': {'output_directory': './results/ptbxl/rm', 'ckpt_path': './results/ptbxl/rm/'}}
+output directory ./results/ptbxl/rm/inference
+2023-01-05 12:17:59.318729: I tensorflow/core/util/cuda_solvers.cc:179] Creating GpuSolver handles for stream 0x653a270
+2023-01-05 12:18:05.916390: I tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:428] Loaded cuDNN version 8101
+2023-01-05 12:18:06.771943: I tensorflow/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2023-01-05 12:18:06.843917: I tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:630] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+./results/ptbxl/rm/T200_beta00.0001_betaT0.02/300000/300000
+Successfully loaded model at iteration 300000
+Data loaded (16, 550, 250, 12)
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.728855379422505 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.663698081175486 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.66549761692683 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.671527747313181 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.667411144574483 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.66492813428243 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.671053580443065 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.671650115648905 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.668422436714172 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.669136532147725 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.668656476338704 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.661281085014343 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.661299498875936 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.662562163670858 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.672741047541301 mins
+saved generated samples at iteration 300000
+begin sampling, total number of reverse steps = 200
+generated 550 utterances of random_digit at iteration 300000 in 13.676585654417673 mins
+saved generated samples at iteration 300000
+Total MAE: 0.004755983
+Total MSE: 0.00038521385
+RMSE: 0.01962686544100375
