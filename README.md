@@ -125,7 +125,7 @@ python inference_nsamples.py -c config/config_SSSDS4_ptbxl_mnr.json
                           
 3.I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results are shown in [1],[2],[3]. For CSDI evaluate code, I noticed that it used the median value of 10 samples generated for each test sample to calculate mae and rmse, while only the averaged value mentioned in the SSSD paper. Need to finish all experiment to figure out which one is more close to the paper results.      
 4.For implemented Tensorflow code, the training config is same as the modified PyTorch version. The **RM, MNR, BM** masking can be changed by commenting/uncommenting in line 570-572(val), 577-579(train), 588-590(evaluate) in imputers/CSDI.py. The same masking should be applied for train, val and evaluation. Note that the previous masking function code by SSSD and CSDI authors are preserved, but will not be used in the model training. The results are shown in the Table.    
-5.I made a stupid mistake when I reshape the data length 1000 using (250, 4) instead of (4, 250). All the CSDI results before Jan. 2 are wrong because the tensor shape of training dataset are wrong. I have to run all the ptbxl experiments again. I suddenly found the misktake this week when I draw the imputation figures. And I also found that the results based on the median value of 10 samples generated for each sample are close to the paper results. Anyway let me redo all the experiment first (updated on Jan. 5).     
+5.I made a stupid mistake when I reshape the data length 1000 using (250, 4) instead of (4, 250). All the CSDI results before Jan. 2 are wrong because the tensor shape of training dataset are wrong. I have to redo all the ptbxl related experiments. I found the mistake when I draw the imputation figures. And I also found that the results based on the median value of 10 samples generated for each sample are close to the paper results.(updated on Jan. 5).     
 
 Fast experiment - 20% BM on PTB-XL
 ```
@@ -167,13 +167,13 @@ python train_csdi_stock.py
 
 **Figure: 20% BM on Hang Seng**
 ![](figures_new/hang_seng_bm/csdi_9.png)
-![](figures_new/hang_seng_bm/sssd_9.png)
+![](figures_new/hang_seng_bm/sssd_9.png)     
 **Figure: 20% BM on Dow Jones**
 ![](figures_new/dow_bm/csdi_48.png)
-![](figures_new/dow_bm/sssd_48.png)
+![](figures_new/dow_bm/sssd_48.png)    
 **Figure: 20% RM on EuroStoxx**
 ![](figures_new/euro_rm/csdi_1.png)
-![](figures_new/euro_rm/sssd_1.png)
+![](figures_new/euro_rm/sssd_1.png)     
 ### Part 2 Bonus question  (if have time after finishing part 1)
 ● Bonus question 1       
 ● Bonus question 2 
