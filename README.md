@@ -137,13 +137,13 @@ python train_csdi.py
 | :----: | :----:| :----: | :----: |  :----: |
 | Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
 | PyTorch [1]|  [20% RM implemented] |  | |  | 
-| Tensorflow | [20% RM implemented] | |  |  |      
+| Tensorflow | [20% RM implemented](figures_new/ptbxl_csdi/rm_tensorflow.out) | 0.0034| 0.0115 |  0.0234|      
 | Paper  | 20% MNR| 0.0186±1e-5 | 0.0435±2e-4 | 0.1306±5e-5 | 
 | PyTorch [2] | [20% MNR implemented]|  | |  | 
-| Tensorflow | [20% MNR implemented] |  |  |  |    
+| Tensorflow | [20% MNR implemented](figures_new/ptbxl_csdi/mnr_tensorflow.out) |0.0114  | 0.0555 | 0.0772 |    
 | Paper  | 20% BM| 0.1054±4e-5 | 0.2254±7e-5 | 0.7468±2e-4 |   
-| PyTorch [3]| [20% BM implemented] |  | |  |    
-| Tensorflow | [20% BM implemented] ||  |  |   
+| PyTorch [3]| [20% BM implemented](figures_new/ptbxl_csdi/bm_pytorch.out) |0.0627 | 0.1742 | 0.4229 |    
+| Tensorflow | [20% BM implemented](figures_new/ptbxl_csdi/bm_tensorflow.out) |0.0649| 0.1787 |0.4477|   
 
 ***2) Train and test on stock dataset (updated on Dec.24)***    
 *Note: some improvements in imputers/CSDI_stock.py compared to the imputers/CSDI.py*         
@@ -174,7 +174,7 @@ python train_csdi_stock.py
 **Figure: 20% RM on EuroStoxx**
 ![](figures_new/euro_rm/csdi_1.png)
 ![](figures_new/euro_rm/sssd_1.png)     
-### Part 2 Bonus question  (if have time after finishing part 1)
+### Part 2 Bonus question  (have no time, decide not to do)
 ● Bonus question 1       
 ● Bonus question 2 
 
