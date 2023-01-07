@@ -145,6 +145,10 @@ python train_csdi.py
 | PyTorch [3]| [20% BM implemented](figures_new/ptbxl_csdi/bm_pytorch.out) |0.0627 | 0.1742 | 0.4229 |    
 | Tensorflow | [20% BM implemented](figures_new/ptbxl_csdi/bm_tensorflow.out) |0.0649| 0.1787 |0.4477|   
 
+**Figure: 20% BM on PTB-XL**
+![](figures_new/ptbxl_bm/csdi_15.png)
+![](figures_new/ptbxl_bm/sssd_15_0.png)     
+
 ***2) Train and test on stock dataset (updated on Dec.24)***    
 *Note: some improvements in imputers/CSDI_stock.py compared to the imputers/CSDI.py*         
 1.write a clear version based on *imputers/CSDI.py*, and deleted all useless functions and config code.       
