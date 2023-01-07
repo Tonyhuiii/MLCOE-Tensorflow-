@@ -95,18 +95,18 @@ Fast experiment - generated 10 samples for each test sample, referenced from the
 ```
 python inference_nsamples.py -c config/config_SSSDS4_ptbxl_mnr.json
 ```
-*Imputation results using the median value of 10 samples generated for each test sample (waiting 40 hours for imputation!!!)*  
+*Imputation results using the median value of 10 samples generated for each test sample (takes 36 hours)*  (updated on Jan. 7) 
 | Results | Config | MAE | RMSE| CRPS |
 | :----: | :----:| :----: | :----: | :----: | 
 | Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 | 0.0282±1e-3 | 
 | PyTorch |  20% RM   | | | |
-| Tensorflow | 20% RM  | |  |   |
+| Tensorflow | [20% RM](figures_new/ptbxl_sssd/rm_inference_10_tensorflow.out)  | 0.0043| 0.0179 | 0.0305  |
 | Paper | 20% MNR| 0.0103±3e-3| 0.0226±9e-4 | 0.0787±3e-3 |  
 | PyTorch |  20% MNR   | | | |
-| Tensorflow | 20% MNR  | |  |   |
+| Tensorflow | [20% MNR](figures_new/ptbxl_sssd/mnr_inference_10_tensorflow.out)  | 0.0173| 0.0654 |  0.1200 |
 | Paper | 20% BM|  0.0324±3e-3| 0.0832±8e-3 | 0.2689±3e-3 |   
 | PyTorch |  20% BM   | | | |
-| Tensorflow | 20% BM  | |  |   |
+| Tensorflow | [20% BM](figures_new/ptbxl_sssd/bm_inference_10_tensorflow.out)  | 0.0515 | 0.1469 | 0.3545  |
 
 #### ● Tensorflow implementation of CSDI   (finished code on Nov.26)
 *Bug: the training loss didn't decrease. (solved on Dec.21, correct the mistake for tensor shape not changing after the transformer encoder layer)*&#x2705;              
@@ -132,14 +132,14 @@ Fast experiment - 20% BM on PTB-XL
 python train_csdi.py
 ```
 
-*Imputation results using CSDI PyTorch code and implemented Tensorflow code with the same modified masking (**using the dataset with correct tensor shape**)*  
+*Imputation results using CSDI PyTorch code and implemented Tensorflow code with the same modified masking (**using the dataset with correct tensor shape**)* (updated on Jan. 7) 
 | Results | Config | MAE | RMSE|  CRPS |
 | :----: | :----:| :----: | :----: |  :----: |
 | Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
-| PyTorch [1]|  [20% RM implemented] |  | |  | 
+| PyTorch [1]|  [20% RM implemented](figures_new/ptbxl_csdi/rm_pytorch.out) | 0.0041 | 0.0143 | 0.0280 | 
 | Tensorflow | [20% RM implemented](figures_new/ptbxl_csdi/rm_tensorflow.out) | 0.0034| 0.0115 |  0.0234|      
 | Paper  | 20% MNR| 0.0186±1e-5 | 0.0435±2e-4 | 0.1306±5e-5 | 
-| PyTorch [2] | [20% MNR implemented]|  | |  | 
+| PyTorch [2] | [20% MNR implemented](figures_new/ptbxl_csdi/mnr_pytorch.out)| 0.0124 | 0.0542| 0.0839 | 
 | Tensorflow | [20% MNR implemented](figures_new/ptbxl_csdi/mnr_tensorflow.out) |0.0114  | 0.0555 | 0.0772 |    
 | Paper  | 20% BM| 0.1054±4e-5 | 0.2254±7e-5 | 0.7468±2e-4 |   
 | PyTorch [3]| [20% BM implemented](figures_new/ptbxl_csdi/bm_pytorch.out) |0.0627 | 0.1742 | 0.4229 |    
