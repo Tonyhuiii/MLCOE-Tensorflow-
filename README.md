@@ -86,10 +86,10 @@ python inference.py -c config/config_SSSDS4_ptbxl_mnr.json
 | Tensorflow | [20% RM](figures_new/ptbxl_sssd/rm_inference_tensorflow.out)  | 0.0048|  0.0196| 
 | Paper  | 20% MNR| 0.0103±3e-3	 | 0.0226±9e-4 |
 | PyTorch | [20% MNR](figures_new/ptbxl_sssd/mnr_inference_pytorch.out) | 0.0190 |0.0636 |
-| Tensorflow |  [20% MNR](figures_new/ptbxl_sssd/mnr_inference_tensorflow.out) | 0.0202	| 0.077  |    
+| Tensorflow |  [20% MNR](figures_new/ptbxl_sssd/mnr_inference_tensorflow.out) | 0.0202	| 0.0770  |    
 | Paper  | 20% BM|  0.0324±3e-3	| 0.0832±8e-3 | 
 | PyTorch |  [20% BM](figures_new/ptbxl_sssd/bm_inference_pytorch.out)  | 0.0619| 0.164| 
-| Tensorflow | [20% BM]  | 0.0608	| 0.162 |  
+| Tensorflow | [20% BM](figures_new/ptbxl_sssd/bm_inference_tensorflow.out)  | 0.0668	| 0.172 |  
 
 Fast experiment - generated 10 samples for each test sample, referenced from the CSDI code (updated on Jan. 5)  
 ```
