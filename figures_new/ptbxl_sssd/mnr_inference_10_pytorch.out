@@ -1,0 +1,186 @@
+CUDA extension for cauchy multiplication not found. Install by going to extensions/cauchy/ and running `python setup.py install`. This should speed up end-to-end training by 10-50%
+Falling back on slow Cauchy kernel. Install at least one of pykeops or the CUDA extension for efficiency.
+{'diffusion_config': {'T': 200, 'beta_0': 0.0001, 'beta_T': 0.02}, 'wavenet_config': {'in_channels': 12, 'out_channels': 12, 'num_res_layers': 36, 'res_channels': 256, 'skip_channels': 256, 'diffusion_step_embed_dim_in': 128, 'diffusion_step_embed_dim_mid': 512, 'diffusion_step_embed_dim_out': 512, 's4_lmax': 250, 's4_d_state': 64, 's4_dropout': 0.0, 's4_bidirectional': 1, 's4_layernorm': 1}, 'train_config': {'output_directory': './results/ptbxl/mnr', 'ckpt_iter': 'max', 'iters_per_ckpt': 50000, 'iters_per_logging': 10000, 'n_iters': 150000, 'learning_rate': 0.0002, 'only_generate_missing': 1, 'use_model': 2, 'masking': 'mnr', 'missing_k': 50}, 'trainset_config': {'train_data_path': './datasets/train_ptbxl_1000.npy', 'test_data_path': './datasets/test_ptbxl_1000.npy', 'segment_length': 250, 'sampling_rate': 100}, 'gen_config': {'output_directory': './results/ptbxl/mnr', 'ckpt_path': './results/ptbxl/mnr/'}}
+output directory ./results/ptbxl/mnr/inference_nsamples
+SSSDS4Imputer Parameters: 48.296972M
+Successfully loaded model at iteration 150000
+Data loaded torch.Size([16, 550, 250, 12])
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7263 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7257 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7256 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7264 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7262 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7264 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7263 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7264 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7264 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7270 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7258 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7250 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7242 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7245 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7248 seconds
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+begin sampling, total number of reverse steps = 200
+generated 10 samples for 550 utterances of random_digit at iteration 150000 in 7244 seconds
+MAE: 0.016610130818684895
+RMSE: 0.06276698765938209
+CRPS: 0.11627145817405299

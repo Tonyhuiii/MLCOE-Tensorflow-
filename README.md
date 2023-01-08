@@ -99,13 +99,13 @@ python inference_nsamples.py -c config/config_SSSDS4_ptbxl_mnr.json
 | Results | Config | MAE | RMSE| CRPS |
 | :----: | :----:| :----: | :----: | :----: | 
 | Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 | 0.0282±1e-3 | 
-| PyTorch |  20% RM   | | | |
+| PyTorch |  [20% RM](figures_new/ptbxl_sssd/rm_inference_10_pytorch.out)   | 0.0041| 0.0192| 0.0295 |
 | Tensorflow | [20% RM](figures_new/ptbxl_sssd/rm_inference_10_tensorflow.out)  | 0.0043| 0.0179 | 0.0305  |
 | Paper | 20% MNR| 0.0103±3e-3| 0.0226±9e-4 | 0.0787±3e-3 |  
-| PyTorch |  20% MNR   | | | |
+| PyTorch |  [20% MNR](figures_new/ptbxl_sssd/mnr_inference_10_pytorch.out)   | 0.0166|0.0628 | 0.1163|
 | Tensorflow | [20% MNR](figures_new/ptbxl_sssd/mnr_inference_10_tensorflow.out)  | 0.0173| 0.0654 |  0.1200 |
 | Paper | 20% BM|  0.0324±3e-3| 0.0832±8e-3 | 0.2689±3e-3 |   
-| PyTorch |  20% BM   | | | |
+| PyTorch |  [20% BM](figures_new/ptbxl_sssd/bm_inference_10_pytorch.out)   | 0.0522|0.1408 | 0.3577|
 | Tensorflow | [20% BM](figures_new/ptbxl_sssd/bm_inference_10_tensorflow.out)  | 0.0515 | 0.1469 | 0.3545  |
 
 #### ● Tensorflow implementation of CSDI   (finished code on Nov.26)
