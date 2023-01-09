@@ -177,11 +177,24 @@ python train_csdi_stock.py
 ![](figures_new/dow_bm/sssd_48.png)    
 **Figure: 20% RM on EuroStoxx**
 ![](figures_new/euro_rm/csdi_1.png)
-![](figures_new/euro_rm/sssd_1.png)     
+![](figures_new/euro_rm/sssd_1.png)  
+
+#### ● Forecasting on Tecent and AIA(updated on Jan.9).  
+Fast experiment - AIA dataset 
+```
+python train_forecast.py -c config/config_SSSDS4_aia.json
+python inference_forecast.py -c config/config_SSSDS4_aia.json
+```
+*Forecasting results using SSSD<sup>S4</sup> model*  
+| Dataset | MAE | RMSE|  
+| :----: | :----: | :----: | 
+| [Tencent](figures_new/tencent_forecast/tencent_inference.out)| 2.32e-3 | 4.75e-3 |     
+| [AIA](figures_new/aia_forecast/aia_inference.out)   | 4.25e-3 | 6.30e-3| 
+
+
 ### Part 2 Bonus question  (have no time, decide not to do)
 ● Bonus question 1       
 ● Bonus question 2 
-
 
 
 ## Acknowledgments 
