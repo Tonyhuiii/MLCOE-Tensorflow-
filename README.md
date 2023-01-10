@@ -48,7 +48,7 @@ python inference.py -c config/config_SSSDS4.json
 *Note: some improvements in train_stock.py*         
 1.implemented two masking methods, "blackout missing with length" and "random missing with length", applied on the valid mask with label 1 and set as missing mask with label 2;       
 2.used different masks for each batch in the same iteration;       
-3.added my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the original PyTorch version using index for valid imputation noise (z[loss_mask]). In the tensorflow verison of train.py, original mse loss directly counts all the mask numbers, although the value is zero for conditional noise (z*loss_mask), will not affect the model training.       
+3.added my_loss function, which counts nonzero numbers in the conditional mask (imputation noise), same as the original PyTorch version using index for valid imputation noise (z[loss_mask]). In the TensorFlow verison of train.py, original mse loss directly counts all the mask numbers, although the value is zero for conditional noise (z*loss_mask), will not affect the model training.       
 
 
 Fast experiment - Hang Seng dataset with "blackout missing with length"", k_segments=5
@@ -124,7 +124,7 @@ python inference_nsamples.py -c config/config_SSSDS4_ptbxl_mnr.json
 | PyTorch |  [0% RM + fixed 20% Random strategy](figures/fixed_0.2_RS.png)| 0.0114 | 0.0351| 0.0783 |      
                           
 3.I reimplemented the **RM, MNR, BM** in the CSDI training module referenced from the masking code in the SSSD, the results are shown in [1],[2],[3]. For CSDI evaluate code, I noticed that it used the median value of 10 samples generated for each test sample to calculate mae and rmse, while only the averaged value mentioned in the SSSD paper. Need to finish all experiment to figure out which one is more close to the paper results.      
-4.For implemented Tensorflow code, the training config is same as the modified PyTorch version. The **RM, MNR, BM** masking can be changed by commenting/uncommenting in line 570-572(val), 577-579(train), 588-590(evaluate) in imputers/CSDI.py. The same masking should be applied for train, val and evaluation. Note that the previous masking function code by SSSD and CSDI authors are preserved, but will not be used in the model training. The results are shown in the Table.    
+4.For implemented TensorFlow code, the training config is same as the modified PyTorch version. The **RM, MNR, BM** masking can be changed by commenting/uncommenting in line 570-572(val), 577-579(train), 588-590(evaluate) in imputers/CSDI.py. The same masking should be applied for train, val and evaluation. Note that the previous masking function code by SSSD and CSDI authors are preserved, but will not be used in the model training. The results are shown in the Table.    
 5.I made a stupid mistake when I reshape the data length 1000 using (250, 4) instead of (4, 250). All the CSDI results before Jan. 2 are wrong because the tensor shape of training dataset are wrong. I have to redo all the ptbxl related experiments. I found the mistake when I draw the imputation figures. And I also found that the results based on the median value of 10 samples generated for each sample are close to the paper results.(updated on Jan. 5).     
 
 Fast experiment - 20% BM on PTB-XL
@@ -187,7 +187,7 @@ python inference_forecast.py -c config/config_SSSDS4_aia.json
 ```
 *Forecasting results using SSSD<sup>S4</sup> model*  
 | Dataset |MAE | RMSE| Relative error|
-| :----: | :----: | :----: | :----: | :----: | 
+| :----: | :----: | :----: | :----: |
 | [Tencent_scale](figures_new/tencent_forecast/tencent_inference.out)| 2.32e-3 | 4.75e-3 |  96.7% |  
 | [Tencent_raw]()| 1.73 | 3.86 |  37.2% |  
 | [AIA_scale](figures_new/aia_forecast/aia_inference.out)   | 4.25e-3 | 6.30e-3| 43.6% |
