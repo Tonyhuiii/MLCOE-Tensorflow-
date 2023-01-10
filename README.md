@@ -1,18 +1,18 @@
-# MLCOE-Tensorflow-implementation
-Tensorflow implementation of paper: Diffusion-based Time Series Imputation and Forecasting with Structured State Space Models (https://arxiv.org/abs/2208.09399).  
+# MLCOE-TensorFlow-implementation
+TensorFlow implementation of paper: Diffusion-based Time Series Imputation and Forecasting with Structured State Space Models (https://arxiv.org/abs/2208.09399).  
 ## Environment
 ● Ubuntu 20.04  
 ● NVIDIA RTX 3090
 ## Prerequisites
 ● Python 3.9.13  
-● [Tensorflow](https://www.tensorflow.org/install) 2.11.0  
+● [TensorFlow](https://www.tensorflow.org/install) 2.11.0  
 ● cudatoolkit 11.2.2  
 ● cudnn 8.1.0 
 
 ## To do list
 ### Part 1 (Dec. 15, 2022)  
-#### ●  Tensorflow implementation of SSSD<sup>S4</sup> (finished on Nov.19)&#x2705;.  
-***1） Validate the tensorflow code on MuJoCo dataset with config_SSSDS4.json (90%RM), config_SSSDS4_mujoco_70.json(70%RM).***    
+#### ●  TensorFlow implementation of SSSD<sup>S4</sup> (finished on Nov.19)&#x2705;.  
+***1） Validate the TensorFlow code on MuJoCo dataset with config_SSSDS4.json (90%RM), config_SSSDS4_mujoco_70.json(70%RM).***    
 *Note: some limitations in the original PyTorch code*            
 1.the training batch is fixed during the iteration (they didn't use PyTorch Dataset and Dataloader for random shuffle);     
 2.the random misssing mask for different batchs is duplicated in the same iteration (not random enough);
@@ -24,12 +24,12 @@ python inference.py -c config/config_SSSDS4.json
 ```
 
 *IMPUTATION MSE RESULTS (RM 90% + Iterations 150,000)* (reproduce MSE results in orginal paper)&#x2705;    
-| Original paper | PyTorch code | Tensorflow code |
+| Original paper | PyTorch code | TensorFlow code |
 | :----:| :----: | :----: |
 | 1.90(3)e-3 | [1.76e-3](figures/test_pytorch.png) | [1.67e-3](figures/test_tf.png) |      
 
 *IMPUTATION MSE RESULTS (RM 70%)* (reproduce MSE results in orginal paper)&#x2705; 
-| Original paper (Iterations 232,000) | Tensorflow code (Iterations 240,000)|
+| Original paper (Iterations 232,000) | TensorFlow code (Iterations 240,000)|
 | :----:| :----: |
 | 0.59(8)e-3 | [0.53e-3](figures/test_tf_24000_rm.png) |
 
@@ -78,18 +78,18 @@ Fast experiment - PTB-XL dataset under 20% MNR (comment line 103, uncomment line
 python train.py -c config/config_SSSDS4_ptbxl_mnr.json
 python inference.py -c config/config_SSSDS4_ptbxl_mnr.json
 ```
-*Imputation results using original PyTorch code and implemented Tensorflow code (one sample, one trial, updated on Jan.5)*  
+*Imputation results using original PyTorch code and implemented TensorFlow code (one sample, one trial, updated on Jan.5)*  
 | Results | Config | MAE | RMSE|  
 | :----: | :----:| :----: | :----: | 
 | Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 |     
 | PyTorch |  [20% RM](figures_new/ptbxl_sssd/rm_inference_pytorch.out)   | 0.0046 | 0.0213| 
-| Tensorflow | [20% RM](figures_new/ptbxl_sssd/rm_inference_tensorflow.out)  | 0.0048|  0.0196| 
+| TensorFlow | [20% RM](figures_new/ptbxl_sssd/rm_inference_tensorflow.out)  | 0.0048|  0.0196| 
 | Paper  | 20% MNR| 0.0103±3e-3	 | 0.0226±9e-4 |
 | PyTorch | [20% MNR](figures_new/ptbxl_sssd/mnr_inference_pytorch.out) | 0.0190 |0.0636 |
-| Tensorflow |  [20% MNR](figures_new/ptbxl_sssd/mnr_inference_tensorflow.out) | 0.0202	| 0.0770  |    
+| TensorFlow |  [20% MNR](figures_new/ptbxl_sssd/mnr_inference_tensorflow.out) | 0.0202	| 0.0770  |    
 | Paper  | 20% BM|  0.0324±3e-3	| 0.0832±8e-3 | 
 | PyTorch |  [20% BM](figures_new/ptbxl_sssd/bm_inference_pytorch.out)  | 0.0619| 0.164| 
-| Tensorflow | [20% BM](figures_new/ptbxl_sssd/bm_inference_tensorflow.out)  | 0.0668	| 0.172 |  
+| TensorFlow | [20% BM](figures_new/ptbxl_sssd/bm_inference_tensorflow.out)  | 0.0668	| 0.172 |  
 
 Fast experiment - generated 10 samples for each test sample, referenced from the CSDI code (updated on Jan. 5)  
 ```
@@ -100,15 +100,15 @@ python inference_nsamples.py -c config/config_SSSDS4_ptbxl_mnr.json
 | :----: | :----:| :----: | :----: | :----: | 
 | Paper | 20% RM| 0.0034±4e-6 | 0.0119±1e-4 | 0.0282±1e-3 | 
 | PyTorch |  [20% RM](figures_new/ptbxl_sssd/rm_inference_10_pytorch.out)   | 0.0041| 0.0192| 0.0295 |
-| Tensorflow | [20% RM](figures_new/ptbxl_sssd/rm_inference_10_tensorflow.out)  | 0.0043| 0.0179 | 0.0305  |
+| TensorFlow | [20% RM](figures_new/ptbxl_sssd/rm_inference_10_tensorflow.out)  | 0.0043| 0.0179 | 0.0305  |
 | Paper | 20% MNR| 0.0103±3e-3| 0.0226±9e-4 | 0.0787±3e-3 |  
 | PyTorch |  [20% MNR](figures_new/ptbxl_sssd/mnr_inference_10_pytorch.out)   | 0.0166|0.0628 | 0.1163|
-| Tensorflow | [20% MNR](figures_new/ptbxl_sssd/mnr_inference_10_tensorflow.out)  | 0.0173| 0.0654 |  0.1200 |
+| TensorFlow | [20% MNR](figures_new/ptbxl_sssd/mnr_inference_10_tensorflow.out)  | 0.0173| 0.0654 |  0.1200 |
 | Paper | 20% BM|  0.0324±3e-3| 0.0832±8e-3 | 0.2689±3e-3 |   
 | PyTorch |  [20% BM](figures_new/ptbxl_sssd/bm_inference_10_pytorch.out)   | 0.0522|0.1408 | 0.3577|
-| Tensorflow | [20% BM](figures_new/ptbxl_sssd/bm_inference_10_tensorflow.out)  | 0.0515 | 0.1469 | 0.3545  |
+| TensorFlow | [20% BM](figures_new/ptbxl_sssd/bm_inference_10_tensorflow.out)  | 0.0515 | 0.1469 | 0.3545  |
 
-#### ● Tensorflow implementation of CSDI   (finished code on Nov.26)
+#### ● TensorFlow implementation of CSDI   (finished code on Nov.26)
 *Bug: the training loss didn't decrease. (solved on Dec.21, correct the mistake for tensor shape not changing after the transformer encoder layer)*&#x2705;              
 
 ***1) 20% RM, MNR, BM on PTB-XL (CSDI) (updated on Dec.13)***     
@@ -132,18 +132,18 @@ Fast experiment - 20% BM on PTB-XL
 python train_csdi.py
 ```
 
-*Imputation results using CSDI PyTorch code and implemented Tensorflow code with the same modified masking (**using the dataset with correct tensor shape**)* (updated on Jan. 7) 
+*Imputation results using CSDI PyTorch code and implemented TensorFlow code with the same modified masking (**using the dataset with correct tensor shape**)* (updated on Jan. 7) 
 | Results | Config | MAE | RMSE|  CRPS |
 | :----: | :----:| :----: | :----: |  :----: |
 | Paper | 20% RM| 0.0038±2e-6 | 0.0189±5e-5 | 0.0265±6e-6 |    
 | PyTorch [1]|  [20% RM implemented](figures_new/ptbxl_csdi/rm_pytorch.out) | 0.0041 | 0.0143 | 0.0280 | 
-| Tensorflow | [20% RM implemented](figures_new/ptbxl_csdi/rm_tensorflow.out) | 0.0034| 0.0115 |  0.0234|      
+| TensorFlow | [20% RM implemented](figures_new/ptbxl_csdi/rm_tensorflow.out) | 0.0034| 0.0115 |  0.0234|      
 | Paper  | 20% MNR| 0.0186±1e-5 | 0.0435±2e-4 | 0.1306±5e-5 | 
 | PyTorch [2] | [20% MNR implemented](figures_new/ptbxl_csdi/mnr_pytorch.out)| 0.0124 | 0.0542| 0.0839 | 
-| Tensorflow | [20% MNR implemented](figures_new/ptbxl_csdi/mnr_tensorflow.out) |0.0114  | 0.0555 | 0.0772 |    
+| TensorFlow | [20% MNR implemented](figures_new/ptbxl_csdi/mnr_tensorflow.out) |0.0114  | 0.0555 | 0.0772 |    
 | Paper  | 20% BM| 0.1054±4e-5 | 0.2254±7e-5 | 0.7468±2e-4 |   
 | PyTorch [3]| [20% BM implemented](figures_new/ptbxl_csdi/bm_pytorch.out) |0.0627 | 0.1742 | 0.4229 |    
-| Tensorflow | [20% BM implemented](figures_new/ptbxl_csdi/bm_tensorflow.out) |0.0649| 0.1787 |0.4477|   
+| TensorFlow | [20% BM implemented](figures_new/ptbxl_csdi/bm_tensorflow.out) |0.0649| 0.1787 |0.4477|   
 
 **Figure: 20% BM on PTB-XL**
 ![](figures_new/ptbxl_bm/csdi_15.png)
@@ -179,17 +179,20 @@ python train_csdi_stock.py
 ![](figures_new/euro_rm/csdi_1.png)
 ![](figures_new/euro_rm/sssd_1.png)  
 
-#### ● Forecasting on Tecent and AIA(updated on Jan.9).  
+#### ● Forecasting on Tencent and AIA(updated on Jan.9).  
 Fast experiment - AIA dataset 
 ```
 python train_forecast.py -c config/config_SSSDS4_aia.json
 python inference_forecast.py -c config/config_SSSDS4_aia.json
 ```
 *Forecasting results using SSSD<sup>S4</sup> model*  
-| Dataset | MAE | RMSE|  
-| :----: | :----: | :----: | 
-| [Tencent](figures_new/tencent_forecast/tencent_inference.out)| 2.32e-3 | 4.75e-3 |     
-| [AIA](figures_new/aia_forecast/aia_inference.out)   | 4.25e-3 | 6.30e-3| 
+| Dataset |MAE | RMSE| Relative error|
+| :----: | :----: | :----: | :----: | :----: | 
+| [Tencent_scale](figures_new/tencent_forecast/tencent_inference.out)| 2.32e-3 | 4.75e-3 |  96.7% |  
+| [Tencent_raw]()| 1.73 | 3.86 |  37.2% |  
+| [AIA_scale](figures_new/aia_forecast/aia_inference.out)   | 4.25e-3 | 6.30e-3| 43.6% |
+| [AIA_raw]()   | | | |
+
 
 
 ### Part 2 Bonus question  (have no time, decide not to do)
