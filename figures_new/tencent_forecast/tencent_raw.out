@@ -1,0 +1,53 @@
+2023-01-09 16:21:11.042028: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-01-09 16:21:11.167958: I tensorflow/core/util/port.cc:104] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2023-01-09 16:21:11.812766: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory
+2023-01-09 16:21:11.812854: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory
+2023-01-09 16:21:11.812869: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+2023-01-09 16:21:12.825413: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-01-09 16:21:13.479102: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1613] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22288 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 3090, pci bus id: 0000:18:00.0, compute capability: 8.6
+1 Physical GPUs, 1 Logical GPUs
+{'diffusion_config': {'T': 200, 'beta_0': 0.0001, 'beta_T': 0.02}, 'wavenet_config': {'in_channels': 28, 'out_channels': 28, 'num_res_layers': 36, 'res_channels': 256, 'skip_channels': 256, 'diffusion_step_embed_dim_in': 128, 'diffusion_step_embed_dim_mid': 512, 'diffusion_step_embed_dim_out': 512, 's4_lmax': 100, 's4_d_state': 64, 's4_dropout': 0.0, 's4_bidirectional': 1, 's4_layernorm': 1}, 'train_config': {'output_directory': './results/tencent_raw', 'ckpt_iter': 'max', 'iters_per_ckpt': 50000, 'iters_per_logging': 10000, 'n_iters': 150000, 'learning_rate': 0.0002, 'only_generate_missing': 1, 'use_model': 2, 'masking': 'tf', 'missing_k': 50}, 'trainset_config': {'train_data_path': './forecast/raw/tecent_train.npy', 'test_data_path': './forecast/raw/tecent_test.npy', 'segment_length': 100, 'sampling_rate': 100}, 'gen_config': {'output_directory': './results/tencent_raw', 'ckpt_path': './results/tencent_raw/'}}
+output directory ./results/tencent_raw/T200_beta00.0001_betaT0.02
+2023-01-09 16:21:14.689233: I tensorflow/core/util/cuda_solvers.cc:179] Creating GpuSolver handles for stream 0x5f71c20
+No valid checkpoint model found, start training from initialization.
+Data loaded (109, 32, 100, 28)
+  0%|          | 0/150001 [00:00<?, ?it/s]WARNING:tensorflow:From /home/chenzhenghui/anaconda3/envs/tf/lib/python3.9/site-packages/tensorflow/python/autograph/pyct/static_analysis/liveness.py:83: Analyzer.lamba_check (from tensorflow.python.autograph.pyct.static_analysis.liveness) is deprecated and will be removed after 2023-09-23.
+Instructions for updating:
+Lambda fuctions will be no more assumed to be used in the statement where they are used, or at least in the same block. https://github.com/tensorflow/tensorflow/issues/56089
+WARNING:tensorflow:AutoGraph could not transform <function _gcd_import at 0x7fb05154e310> and will run it as-is.
+Cause: Unable to locate the source code of <function _gcd_import at 0x7fb05154e310>. Note that functions defined in certain environments, like the interactive Python shell, do not expose their source code. If that is the case, you should define them in a .py source file. If you are certain the code is graph-compatible, wrap the call using @tf.autograph.experimental.do_not_convert. Original error: could not get source code
+To silence this warning, decorate the function with @tf.autograph.experimental.do_not_convert
+WARNING:tensorflow:Gradients do not exist for variables ['sssds4_imputer/residual_group/residual_block_35/conv1d_143/kernel:0', 'sssds4_imputer/residual_group/residual_block_35/conv1d_143/bias:0'] when minimizing the loss. If you're using `model.compile()`, did you forget to provide a `loss` argument?
+WARNING:tensorflow:Gradients do not exist for variables ['sssds4_imputer/residual_group/residual_block_35/conv1d_143/kernel:0', 'sssds4_imputer/residual_group/residual_block_35/conv1d_143/bias:0'] when minimizing the loss. If you're using `model.compile()`, did you forget to provide a `loss` argument?
+WARNING:tensorflow:Gradients do not exist for variables ['sssds4_imputer/residual_group/residual_block_35/conv1d_143/kernel:0', 'sssds4_imputer/residual_group/residual_block_35/conv1d_143/bias:0'] when minimizing the loss. If you're using `model.compile()`, did you forget to provide a `loss` argument?
+WARNING:tensorflow:Gradients do not exist for variables ['sssds4_imputer/residual_group/residual_block_35/conv1d_143/kernel:0', 'sssds4_imputer/residual_group/residual_block_35/conv1d_143/bias:0'] when minimizing the loss. If you're using `model.compile()`, did you forget to provide a `loss` argument?
+2023-01-09 16:23:58.639515: I tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:630] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+2023-01-09 16:23:59.404817: I tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:428] Loaded cuDNN version 8101
+2023-01-09 16:24:00.231463: I tensorflow/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2023-01-09 16:24:00.664517: I tensorflow/compiler/xla/service/service.cc:173] XLA service 0x7faae2b2b4c0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2023-01-09 16:24:00.664567: I tensorflow/compiler/xla/service/service.cc:181]   StreamExecutor device (0): NVIDIA GeForce RTX 3090, Compute Capability 8.6
+2023-01-09 16:24:00.669319: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:268] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+2023-01-09 16:24:00.752018: I tensorflow/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2023-01-09 16:24:00.803303: I tensorflow/compiler/jit/xla_compilation_cache.cc:477] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+iteration: 0 	loss: 0.00028013577684760094
+iteration: 10000 	loss: 0.00011667376384139061
+  7%|▋         | 10000/150001 [1:08:55<16:04:55,  2.42it/s]iteration: 20000 	loss: 8.361256186617538e-05
+ 13%|█▎        | 20000/150001 [2:14:08<14:27:38,  2.50it/s]iteration: 30000 	loss: 9.222152584698051e-05
+ 20%|█▉        | 30000/150001 [3:19:19<13:12:23,  2.52it/s]iteration: 40000 	loss: 2.8630927772610448e-05
+ 27%|██▋       | 40000/150001 [4:24:30<12:02:41,  2.54it/s]iteration: 50000 	loss: 5.259411409497261e-05
+ 33%|███▎      | 50000/150001 [5:29:40<10:55:03,  2.54it/s]model at iteration 50000 is saved
+iteration: 60000 	loss: 4.0768652979750186e-05
+ 40%|███▉      | 60000/150001 [6:34:49<9:48:27,  2.55it/s] iteration: 70000 	loss: 1.578761475684587e-05
+ 47%|████▋     | 70000/150001 [7:39:54<8:42:17,  2.55it/s]iteration: 80000 	loss: 7.925170939415693e-05
+ 53%|█████▎    | 80000/150001 [8:44:59<7:36:33,  2.56it/s]iteration: 90000 	loss: 1.7621136066736653e-05
+ 60%|█████▉    | 90000/150001 [9:50:06<6:31:09,  2.56it/s]iteration: 100000 	loss: 1.26936847664183e-05
+ 67%|██████▋   | 100000/150001 [10:55:19<5:25:59,  2.56it/s]model at iteration 100000 is saved
+iteration: 110000 	loss: 3.396339889150113e-05
+ 73%|███████▎  | 110000/150001 [12:00:31<4:20:48,  2.56it/s]iteration: 120000 	loss: 2.814919025695417e-05
+ 80%|███████▉  | 120000/150001 [13:05:41<3:15:34,  2.56it/s]iteration: 130000 	loss: 2.2022706616553478e-05
+ 87%|████████▋ | 130000/150001 [14:10:50<2:10:21,  2.56it/s]iteration: 140000 	loss: 5.7199726143153384e-05
+ 93%|█████████▎| 140000/150001 [15:15:59<1:05:10,  2.56it/s]iteration: 150000 	loss: 1.5466670447494835e-05
+100%|█████████▉| 150000/150001 [16:21:08<00:00,  2.56it/s]  model at iteration 150000 is saved
+100%|█████████▉| 150000/150001 [16:21:47<00:00,  2.55it/s]
