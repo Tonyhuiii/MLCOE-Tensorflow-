@@ -180,18 +180,20 @@ python train_csdi_stock.py
 ![](figures_new/euro_rm/sssd_1.png)  
 
 #### ● Forecasting on Tencent and AIA(updated on Jan.9).  
-Fast experiment - AIA dataset 
+Fast experiment - AIA raw dataset 
 ```
-python train_forecast.py -c config/config_SSSDS4_aia.json
-python inference_forecast.py -c config/config_SSSDS4_aia.json
+python train_forecast.py -c config/config_SSSDS4_aia_raw.json
+python inference_forecast.py -c config/config_SSSDS4_aia_raw.json
 ```
 *Forecasting results using SSSD<sup>S4</sup> model*  
-| Dataset |MAE | RMSE| Relative error|
-| :----: | :----: | :----: | :----: |
-| [Tencent_scale](figures_new/tencent_forecast/tencent_inference.out)| 2.32e-3 | 4.75e-3 |  95.2% |  
-| [Tencent_raw](figures_new/tencent_forecast/tencent_raw_inference.out)| 1.73 | 3.86 |  36.7% |  
-| [AIA_scale](figures_new/aia_forecast/aia_inference.out)   | 4.25e-3 | 6.30e-3| 42.6% |
-| [AIA_raw](figures_new/aia_forecast/aia_raw_inference.out)   | 0.37| 0.61| 30.5%|
+| Dataset | Checkpoint |MAE | RMSE| Relative error|
+| :----: | :----: |:----: | :----: | :----: |
+| [Tencent_scale](figures_new/tencent_forecast/tencent_inference.out)|100,000 |2.32e-3 | 4.75e-3 |  95.2% |
+| [Tencent_raw](figures_new/tencent_forecast/tencent_raw_inference10.out)|100,000 |1.77 | 3.94|  38.3% | 
+| [Tencent_raw](figures_new/tencent_forecast/tencent_raw_inference.out)|150,000 |1.73 | 3.86 |  36.7% |  
+| [AIA_scale](figures_new/aia_forecast/aia_inference.out)   | 100,000 |4.25e-3 | 6.30e-3| 42.6% |
+| [AIA_raw](figures_new/aia_forecast/aia_raw_inference10.out)   | 100,000 |0.371| 0.611| 30.0%|
+| [AIA_raw](figures_new/aia_forecast/aia_raw_inference.out)   | 150,000 |0.374| 0.610| 30.5%|
 
 
 
